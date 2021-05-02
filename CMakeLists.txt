@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 #Name of the project
-project(Graphics_Squelette)
+project(Dice_Project)
 
 #Tells where are the destination directories
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY   ${CMAKE_BINARY_DIR}/lib)
@@ -105,26 +105,26 @@ endif()
 
 make_directory("bin")
 
-#Configure Graphics_Squelette
+#Configure Dice_Project
 file(GLOB_RECURSE SRCS    src/*.cpp src/*.c)
 file(GLOB_RECURSE HEADERS include/*.h include/*.hpp)
 
 #TODO add the library path here
 link_directories(${SDL2_LIBRARY_PATH} ${GLEW_LIBRARY_PATH} ${SDL2_IMAGE_LIBRARY_PATH})
-add_executable(Graphics_Squelette ${SRCS} ${HEADERS})
-target_compile_definitions(Graphics_Squelette PUBLIC _USE_MATH_DEFINES)
+add_executable(Dice_Project ${SRCS} ${HEADERS})
+target_compile_definitions(Dice_Project PUBLIC _USE_MATH_DEFINES)
 
 #TODO add another -I parameter (include directory to take account to) and a -l parameter (libraries to link to)
 #Normally you have just to modify the target_compile_options
 
-target_include_directories(Graphics_Squelette PUBLIC
+target_include_directories(Dice_Project PUBLIC
         ${SDL2_INCLUDE_PATH}
         ${SDL2_IMAGE_INCLUDE_PATH}
         ${GLEW_INCLUDE_PATH}
         ${GL_INCLUDE_PATH})
 
 if(MINGW)
-    target_link_libraries(Graphics_Squelette PUBLIC
+    target_link_libraries(Dice_Project PUBLIC
         -lOpenGL32
         -lglew32
         -lSDL2
@@ -150,10 +150,10 @@ if(MINGW)
     endforeach(srcfile)
 
     add_custom_target(BinTarget DEPENDS ${BinOutput})
-    add_dependencies(Graphics_Squelette BinTarget)
+    add_dependencies(Dice_Project BinTarget)
 
 elseif(MSVC)
-    target_link_libraries(Graphics_Squelette general
+    target_link_libraries(Dice_Project general
         "OpenGL32.lib"
         "glew32.lib"
         "SDL2.lib"
@@ -184,11 +184,11 @@ elseif(MSVC)
     endforeach(srcfile)
 
     add_custom_target(BinTarget DEPENDS ${BinOutput})
-    add_dependencies(Graphics_Squelette BinTarget)
+    add_dependencies(Dice_Project BinTarget)
 else()
     find_package(OpenGL REQUIRED)
     find_package(GLEW REQUIRED)
-    target_link_libraries(Graphics_Squelette PUBLIC
+    target_link_libraries(Dice_Project PUBLIC
         ${OPENGL_gl_LIBRARY}
         ${GLEW_LIBRARIES}
         -lSDL2
@@ -218,4 +218,4 @@ foreach(srcfile ${SHADERRESOURCES})
 endforeach(srcfile)
 
 add_custom_target(ShaderTarget DEPENDS ${ShadersOutput})
-add_dependencies(Graphics_Squelette ShaderTarget)
+add_dependencies(Dice_Project ShaderTarget)
