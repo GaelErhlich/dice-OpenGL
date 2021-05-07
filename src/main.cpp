@@ -11,11 +11,12 @@
 #include <glm/gtc/matrix_transform.hpp> 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Initialization.hpp"
+#include "EventsManager.hpp"
+
 #include "Shader.h"
 
 #include "logger.h"
-
-#include "Initialization.hpp"
 
 
 
@@ -47,26 +48,9 @@ int main(int argc, char* argv[])
     {
         //Time in ms telling us when this frame started. Useful for keeping a fix framerate
         uint32_t timeBegin = SDL_GetTicks();
-
-        //Fetch the SDL events
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-        {
-            switch (event.type)
-            {
-            case SDL_WINDOWEVENT:
-                switch (event.window.event)
-                {
-                case SDL_WINDOWEVENT_CLOSE:
-                    isOpened = false;
-                    break;
-                default:
-                    break;
-                }
-                break;
-                //We can add more event, like listening for the keyboard or the mouse. See SDL_Event documentation for more details
-            }
-        }
+        
+        manageEvents(isOpened);
+        
 
         //Clear the screen : the depth buffer and the color buffer
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);

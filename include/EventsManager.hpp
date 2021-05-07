@@ -1,0 +1,3 @@
+
+
+void manageEvents(bool& isOpened);
