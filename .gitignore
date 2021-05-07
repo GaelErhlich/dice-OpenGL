@@ -1,6 +1,6 @@
-build
-out
-.vs
+build/
+out/
+.vs/
 
 CMakeLists.txt.user
 CMakeCache.txt
