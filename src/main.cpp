@@ -15,6 +15,7 @@
 #include "EventsManager.hpp"
 
 #include "Shader.h"
+#include "Compound.hpp"
 
 #include "logger.h"
 
