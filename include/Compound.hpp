@@ -15,7 +15,7 @@ public:
 
 private:
 	Geometry *shape = NULL; // The Geometry object in the current node
-	GLuint textureID = NULL; // The OpenGL texture ID
+	GLuint textureID[4]; // The OpenGL texture ID
 	mat4 relativeTransf = mat4(); // The matrix placing this compound relatively to its parent compound
 	mat4 modelMatrix = mat4(); // The matrix placing this compound, relatively to the world (for storage purposes)
 	
