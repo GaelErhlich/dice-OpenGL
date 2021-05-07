@@ -39,6 +39,7 @@ bool initializeOpenGL(SDL_Window* &window, SDL_GLContext &context, int WIDTH, in
     glClearColor(0.0, 0.0, 0.0, 1.0); //Full Black
 
     glEnable(GL_DEPTH_TEST); //Active the depth test
+    glDepthFunc(GL_LESS);
 
     return true;
 
