@@ -3,6 +3,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
 
+#include <iostream>
+using std::cout;
+
 void manageEvents(bool &isOpened) {
     //Fetch the SDL events
     SDL_Event event;
@@ -10,17 +13,29 @@ void manageEvents(bool &isOpened) {
     {
         switch (event.type)
         {
-        case SDL_WINDOWEVENT:
-            switch (event.window.event)
-            {
-            case SDL_WINDOWEVENT_CLOSE:
-                isOpened = false;
+            case SDL_WINDOWEVENT:
+                switch (event.window.event)
+                {
+                case SDL_WINDOWEVENT_CLOSE:
+                    isOpened = false;
+                    break;
+                default:
+                    break;
+                }
                 break;
-            default:
+            
+            
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym)
+                {
+                case SDLK_ESCAPE:
+                    isOpened = false;
+                    break;
+                default:
+                    break;
+                }
                 break;
-            }
-            break;
-            //We can add more event, like listening for the keyboard or the mouse. See SDL_Event documentation for more details
+            
         }
     }
 }
