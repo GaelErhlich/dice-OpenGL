@@ -103,13 +103,13 @@ int main(int argc, char* argv[])
         //             Loop end
         ////////////////////////////////////////
 
-        //Display on screen (swap the buffer on screen and the buffer you are drawing on)
+        // Display on screen (swap the buffer on screen and the buffer you are drawing on)
         SDL_GL_SwapWindow(window);
 
-        //Time in ms telling us when this frame ended. Useful for keeping a fix framerate
+        // Time in ms telling us when this frame ended. Useful for keeping a fix framerate
         uint32_t timeEnd = SDL_GetTicks();
 
-        //We want FRAMERATE FPS
+        // We want FRAMERATE FPS
         if (timeEnd - timeBegin < TIME_PER_FRAME_MS)
             SDL_Delay(TIME_PER_FRAME_MS - (timeEnd - timeBegin));
     }
