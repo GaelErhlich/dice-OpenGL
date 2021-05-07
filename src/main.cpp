@@ -55,8 +55,8 @@ int main(int argc, char* argv[])
 
     bool isOpened = true;
 
-    mat4 viewMat;
     mat4 modelMat;
+    mat4 viewMat;
     mat4 projectionMat;
 
 

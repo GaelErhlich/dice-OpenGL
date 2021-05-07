@@ -111,7 +111,7 @@ file(GLOB_RECURSE HEADERS include/*.h include/*.hpp)
 
 #TODO add the library path here
 link_directories(${SDL2_LIBRARY_PATH} ${GLEW_LIBRARY_PATH} ${SDL2_IMAGE_LIBRARY_PATH})
-add_executable(Dice_Project ${SRCS} ${HEADERS} "src/Initialization.cpp" "include/Initialization.hpp" "src/EventsManager.cpp" "include/EventsManager.hpp" "src/Compound/Compound.cpp" "include/Compound.hpp")
+add_executable(Dice_Project ${SRCS} ${HEADERS} "src/Initialization.cpp" "include/Initialization.hpp" "src/EventsManager.cpp" "include/EventsManager.hpp" "src/Compounds/Compound.cpp" "include/Compound.hpp")
 target_compile_definitions(Dice_Project PUBLIC _USE_MATH_DEFINES)
 
 #TODO add another -I parameter (include directory to take account to) and a -l parameter (libraries to link to)
