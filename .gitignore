@@ -1,4 +1,7 @@
 build
+out
+.vs
+
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
