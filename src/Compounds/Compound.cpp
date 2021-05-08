@@ -1,19 +1,20 @@
 #include "Compound.hpp"
 
 // Constructor
-Compound::Compound(Geometry* shape, GLuint textureID, mat4 relativeTransformation, Shader shaderProgram)
+Compound::Compound(Geometry* shape, GLuint textureID, GLuint shaderProgramID, mat4 relativeTransformation)
 {
 	this->shape = shape;
 	this->textureID = textureID;
 	this->relativeTransf = relativeTransformation;
+	this->shaderProgramID = shaderProgramID;
 }
 
 // Getters & setters
 Compound Compound::getChild(int i) {
-	return childNode[i];
+	return childNodes[i];
 }
 void Compound::setChild(Compound* child, int i) {
-	childNode[i] = *child;
+	childNodes[i] = *child;
 }
 
 Geometry* Compound::getShape() {
@@ -27,15 +28,60 @@ void Compound::setRelativeTransf(mat4 relativeTransformation) {
 	this->relativeTransf = relativeTransf;
 	this->mustUpdateModelMat = true;
 }
+bool Compound::isModelMatUpToDate() {
+	return this->mustUpdateModelMat;
+}
 
-
-
-void Compound::calculateModelMatrices() {
-	//TODO
+void Compound::calculateModelMatrix(mat4 parentModelMatrix) {
+	modelMatrix = parentModelMatrix * this->relativeTransf;
+	this->mustUpdateModelMat = false;
+	this->calculateChildModelMatrices();
 }
 
 
-// Use
+void Compound::calculateChildModelMatrices() {
+	for (Compound child : childNodes) {
+		child.calculateModelMatrix(this->modelMatrix);
+	}
+}
+
+
+
 void Compound::draw() {
-	//TODO
+
+	// First : checking if the model matrix must be updated (Only applies if this IS the tree root)
+	// If it must be updated, since it's the tree root, model matrix = relative transformation.
+	// In other words, the virtual parent node is the world, making this task easy.
+	if (this->mustUpdateModelMat) {
+		this->modelMatrix = this->relativeTransf;
+	}
+
+
+	// Secondly : the compound is actually drawn
+
+	//////////// TODO
+
+
+	// Thirdly : checking if the child nodes' model matrices must be edited.
+	// Since they are not at the root, they need their parent's model matrix.
+	// This is why the calculateModelMatrix() recursion is initialized here.
+
+	if (this->mustUpdateModelMat) { // Case in which this node has been edited
+		this->calculateChildModelMatrices(); // Then all its children must be edited too.
+		this->mustUpdateModelMat = false;
+	}
+	else { // Case in which this node hasn't been edited, but maybe a child needs to be updated
+		for (Compound child : childNodes) {
+			if (child.mustUpdateModelMat)
+				child.calculateModelMatrix(this->modelMatrix);
+		}
+	}
+
+	// Lastly : The child compounds are also drawn
+	for (Compound child : childNodes) {
+		child.draw();
+	}
+	
+
+	
 }
