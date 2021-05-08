@@ -1,9 +1,13 @@
 #include "Compound.hpp"
 
+#include <glm/gtc/type_ptr.hpp>
+
+
 // Constructor
-Compound::Compound(Geometry* shape, GLuint textureID, GLuint shaderProgramID, mat4 relativeTransformation)
+Compound::Compound(GLuint vaoID, size_t nbPoints, GLuint textureID, GLuint shaderProgramID, mat4 relativeTransformation)
 {
-	this->shape = shape;
+	this->vaoID = vaoID;
+	this->nbPoints = nbPoints;
 	this->textureID = textureID;
 	this->relativeTransf = relativeTransformation;
 	this->shaderProgramID = shaderProgramID;
@@ -17,11 +21,11 @@ void Compound::setChild(Compound* child, int i) {
 	childNodes[i] = *child;
 }
 
-Geometry* Compound::getShape() {
-	return shape;
+GLuint Compound::getVAO() {
+	return vaoID;
 }
-void Compound::setShape(Geometry* shape) {
-	this->shape = shape;
+void Compound::setVAO(GLuint vaoID) {
+	this->vaoID = vaoID;
 }
 
 void Compound::setRelativeTransf(mat4 relativeTransformation) {
@@ -59,7 +63,14 @@ void Compound::draw() {
 
 	// Secondly : the compound is actually drawn
 
-	//////////// TODO
+	glUseProgram(shaderProgramID);
+	glBindVertexArray(vaoID);
+	if (textureID != 0) {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE0, textureID);
+	}
+	glUniformMatrix4fv(shaderProgramID, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+	glDrawArrays(GL_TRIANGLES, 0, nbPoints);
 
 
 	// Thirdly : checking if the child nodes' model matrices must be edited.
@@ -84,4 +95,11 @@ void Compound::draw() {
 	
 
 	
+}
+
+
+
+
+
+Compound::~Compound() {
 }

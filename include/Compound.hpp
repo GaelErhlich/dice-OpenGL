@@ -9,22 +9,24 @@
 
 using std::vector;
 using glm::mat4;
+using std::size_t;
 
 class Compound
 {
 public:
-	// TODO :	On devrait remplacer l'élement Geometry par un VAO, sans quoi on peut pas tracer.
-	//			Mais du coup, on devra générer le VAO à l'extérieur de la classe. Je sais pas si c'est une bonne idée.
 
 	// Constructor
-	Compound(Geometry* shape, GLuint textureID, GLuint shaderProgramID, mat4 relativeTransformation);
+	Compound(GLuint vaoID, size_t nbPoints, GLuint textureID, GLuint shaderProgramID, mat4 relativeTransformation);
+
+	// Destructor
+	~Compound();
 
 	// Getters & setters
 	Compound getChild(int i);
 	void setChild(Compound *child, int i);
 
-	Geometry* getShape();
-	void setShape(Geometry *shape);
+	GLuint getVAO();
+	void setVAO(GLuint vaoID);
 
 	void setRelativeTransf(mat4 relativeTransformation);
 	bool isModelMatUpToDate();
@@ -46,7 +48,8 @@ protected:
 
 
 private:
-	Geometry *shape = NULL; // The Geometry object in the current node
+	GLuint vaoID = 0; // The Geometry object in the current node
+	size_t nbPoints = 0;
 	GLuint textureID = 0; // The OpenGL texture ID
 	mat4 modelMatrix = mat4(); // The matrix placing this compound, relatively to the world (could be calculated, but better stored)
 	GLuint shaderProgramID = 0;

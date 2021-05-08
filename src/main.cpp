@@ -17,6 +17,8 @@
 #include "Shader.h"
 #include "Compound.hpp"
 
+#include "Cube.h"
+
 #include "logger.h"
 
 
@@ -59,6 +61,51 @@ int main(int argc, char* argv[])
     mat4 modelMat;
     mat4 viewMat;
     mat4 projectionMat;
+
+
+    ///////////////////////////////////////////////////////////////////////
+    //
+    //           ---------  INITIALIZING ELEMENTS  ---------
+    //
+    ///////////////////////////////////////////////////////////////////////
+    
+    ////////////////////////////////////////
+    //             Cube VAO
+    ////////////////////////////////////////
+
+    GLuint vaoCube;
+    GLuint vboCube[3];
+    glGenVertexArrays(1, &vaoCube);
+    glGenBuffers(3, vboCube);
+
+    Cube cube = Cube();
+
+    glBindVertexArray(vaoCube);
+    glBindBuffer(GL_ARRAY_BUFFER, vboCube[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cube.getVertices()), cube.getVertices(), GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vboCube[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cube.getNormals()), cube.getNormals(), GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vboCube[2]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cube.getUVs()), cube.getUVs(), GL_STATIC_DRAW);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
+    
+
+    ////////////////////////////////////////
+    //       Complete program (cplt)
+    ////////////////////////////////////////
+
+    Shader shader;
+    shader.loadFromStrings("Shaders/cplt.vert", "Shaders/cplt.frag");
+
 
 
     ///////////////////////////////////////////////////////////////////////
