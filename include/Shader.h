@@ -19,6 +19,9 @@ class Shader
         /* \brief Destructor. Destroy the shader component created */
         ~Shader();
 
+        /* \brief changes the OpenGL context to use this shader program */
+        void use();
+
         /** \brief get the program ID stored in the graphic memory of this shader.
          * \return the program ID */
         int getProgramID() const;
@@ -36,7 +39,7 @@ class Shader
          * \param fragmentFile the fragment file.
          *
          * \return the Shader constructed or NULL if error*/
-        static Shader* loadFromFiles(FILE* vertexFile, FILE* fragFile);
+        static Shader* loadFromFiles(const char *vertexFilePath, const char *fragFilePath);
 
         /** \brief create a shader from a vertex and a fragment string.
          * \param vertexString the vertex string.

@@ -1,5 +1,15 @@
 #include "Shader.h"
 
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
+using std::string;
+using std::ifstream;
+
+
+
 Shader::Shader() : m_programID(0), m_vertexID(0), m_fragID(0)
 {}
 
@@ -10,36 +20,47 @@ Shader::~Shader()
     glDeleteShader(m_fragID);
 }
 
-Shader* Shader::loadFromFiles(FILE* vertexFile, FILE* fragFile)
+Shader* Shader::loadFromFiles(const char *vertexFilePath, const char *fragFilePath)
 {
-    uint32_t vertexFileSize = 0;
-    uint32_t fragFileSize   = 0;
-    char* vertexCodeC;
-    char* fragCodeC;
 
-    /* Determine the vertex and fragment shader sizes */
-    fseek(vertexFile, 0, SEEK_END);
-    vertexFileSize = ftell(vertexFile);
-    fseek(vertexFile, 0, SEEK_SET);
+    // ---------- Code from LearnOpenGL (modified) ----------
 
-    fseek(fragFile, 0, SEEK_END);
-    fragFileSize = ftell(fragFile);
-    fseek(fragFile, 0, SEEK_SET);
+    // 1. retrieve the vertex/fragment source code from filePath
+    string vertexCode;
+    string fragmentCode;
+    ifstream vShaderFile;
+    ifstream fShaderFile;
+    // ensure ifstream objects can throw exceptions:
+    vShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
+    fShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
+    try
+    {
+        // open files
+        vShaderFile.open(vertexFilePath, ifstream::out);
+        fShaderFile.open(fragFilePath);
+        std::stringstream vShaderStream, fShaderStream;
+        // read file’s buffer contents into streams
+        vShaderStream << vShaderFile.rdbuf();
+        fShaderStream << fShaderFile.rdbuf();
+        // close file handlers
+        vShaderFile.close();
+        fShaderFile.close();
+        // convert stream into string
+        vertexCode = vShaderStream.str();
+        fragmentCode = fShaderStream.str();
+    }
+    catch (std::ifstream::failure e)
+    {
+        perror("ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ");
+    }
+    const char* vShaderCode = vertexCode.c_str();
+    const char* fShaderCode = fragmentCode.c_str();
 
-    /* Read the files */
-    vertexCodeC = (char*)malloc(vertexFileSize+1);
-    fragCodeC   = (char*)malloc(fragFileSize+1);
+    // ---------- END code from LearnOpenGL ----------
 
-    fread(vertexCodeC, 1, vertexFileSize, vertexFile);
-    vertexCodeC[vertexFileSize] = '\0';
-    fread(fragCodeC, 1, fragFileSize, fragFile);
-    fragCodeC[fragFileSize] = '\0';
 
     /* Return the shader and free everything*/
-    Shader* s = loadFromStrings(std::string(vertexCodeC), std::string(fragCodeC));
-
-    free(vertexCodeC);
-    free(fragCodeC);
+    Shader* s = loadFromStrings(vShaderCode, fShaderCode);
 
     return s;
 }
@@ -104,6 +125,10 @@ int Shader::loadShader(const std::string& code, int type)
     }
 
     return shader;
+}
+
+void Shader::use() {
+    glUseProgram(this->getProgramID());
 }
 
 int Shader::getProgramID() const

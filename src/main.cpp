@@ -103,8 +103,9 @@ int main(int argc, char* argv[])
     //       Complete program (cplt)
     ////////////////////////////////////////
 
-    Shader shader;
-    shader.loadFromStrings("Shaders/cplt.vert", "Shaders/cplt.frag");
+    Shader cpltShader;
+    //shader.loadFromFiles("C:\\Users\\user\\Documents\\Polytech\\ET3 (S2)\\Spé Informatique graphique\\Dice Project\\Shaders\\cplt.vert", "Initialization.cpp");
+    cpltShader.loadFromFiles("Shaders/cplt.vert", "Shaders/cplt.frag");
 
 
 
@@ -130,6 +131,12 @@ int main(int argc, char* argv[])
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         glClearColor(0.25f, 0.23f, 0.40f, 1.0f);
 
+        ////////////////////////////////////////
+        //            Test cube
+        ////////////////////////////////////////
+        cpltShader.use();
+        glBindVertexArray(vaoCube);
+        glDrawArrays(GL_STATIC_DRAW, 0, cube.getNbVertices());
 
 
         ////////////////////////////////////////
