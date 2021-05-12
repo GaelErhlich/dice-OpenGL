@@ -4,13 +4,13 @@
 
 
 // Constructor
-Compound::Compound(GLuint vaoID, size_t nbPoints, GLuint textureID, GLuint shaderProgramID, mat4 relativeTransformation)
+Compound::Compound(GLuint vaoID, size_t nbPoints, GLuint textureID, Shader* shader, mat4 relativeTransformation)
 {
 	this->vaoID = vaoID;
 	this->nbPoints = nbPoints;
 	this->textureID = textureID;
 	this->relativeTransf = relativeTransformation;
-	this->shaderProgramID = shaderProgramID;
+	this->shaderProgram = shader;
 }
 
 // Getters & setters
@@ -63,13 +63,13 @@ void Compound::draw() {
 
 	// Secondly : the compound is actually drawn
 
-	glUseProgram(shaderProgramID);
+	shaderProgram->use();
 	glBindVertexArray(vaoID);
 	if (textureID != 0) {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE0, textureID);
 	}
-	glUniformMatrix4fv(shaderProgramID, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+	shaderProgram->setMat4f("model", modelMatrix);
 	glDrawArrays(GL_TRIANGLES, 0, nbPoints);
 
 

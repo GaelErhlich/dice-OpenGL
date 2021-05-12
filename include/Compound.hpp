@@ -16,7 +16,7 @@ class Compound
 public:
 
 	// Constructor
-	Compound(GLuint vaoID, size_t nbPoints, GLuint textureID, GLuint shaderProgramID, mat4 relativeTransformation);
+	Compound(GLuint vaoI, size_t nbPoints, GLuint textureID, Shader* shader, mat4 relativeTransformation);
 
 	// Destructor
 	~Compound();
@@ -52,7 +52,7 @@ private:
 	size_t nbPoints = 0;
 	GLuint textureID = 0; // The OpenGL texture ID
 	mat4 modelMatrix = mat4(); // The matrix placing this compound, relatively to the world (could be calculated, but better stored)
-	GLuint shaderProgramID = 0;
+	Shader *shaderProgram = NULL;
 	
 	// Indicates if relativeTransf has been updated but not modelMatrix.
 	// If true, this compound's modelMatrix and all it's children's must be updated before the next render.

@@ -15,9 +15,7 @@ Geometry::~Geometry()
 }
 
 
-GLuint* Geometry::getOneNewVAO(GLenum usage) {
-    GLuint VAO;
-    GLuint VBO;
+void Geometry::getOneNewVAO(GLuint &VAO, GLuint &VBO, GLenum usage) {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
 
@@ -42,6 +40,4 @@ GLuint* Geometry::getOneNewVAO(GLenum usage) {
     glBindVertexArray(0);
 
     VAOs.push_back(VAO);
-    GLuint VBAO[2] = { VAO,VBO };
-    return VBAO;
 }

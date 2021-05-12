@@ -37,7 +37,7 @@ class Geometry
         uint32_t getNbVertices() const {return m_nbVertices;}
 
 
-        GLuint* getOneNewVAO(GLenum usage);
+        void getOneNewVAO(GLuint &VAO, GLuint &VBO, GLenum usage);
 
 
     protected: 

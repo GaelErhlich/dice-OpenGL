@@ -22,12 +22,6 @@
 #include "logger.h"
 
 
-
-
-
-// Temporary
-#include "glm/gtc/type_ptr.hpp"
-
 using std::cout;
 
 using glm::vec2;
@@ -70,13 +64,12 @@ int main(int argc, char* argv[])
     ///////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////
-    //             Cube VAO                ----------------------------------------------------------------- Partie probablement problématique
+    //              Cube
     ////////////////////////////////////////
 
     Cube cube = Cube();
-    GLuint* VBAO = cube.getOneNewVAO(GL_STATIC_DRAW);
-    GLuint vaoCube = VBAO[0];
-    GLuint vboCube = VBAO[1];
+    GLuint vaoCube, vboCube;
+    cube.getOneNewVAO(vaoCube, vboCube, GL_STATIC_DRAW);
 
    ////////////////////////////////////////
    //             Triangle                
@@ -109,9 +102,6 @@ int main(int argc, char* argv[])
 
     glBindVertexArray(vaoTri);
 
-    // Je définis que l'emplacement mémoire 0 (celui utilisé explicitement dans cplt.vert) est pour les 3 positions, 1 pour les 3 normales, et 2 pour les 2 UVs.
-    // J'indique qu'ils sont en 3 "blocs homogènes" en disant par exemple que les normales sont 3, qu'il y en a un ensemble toutes les 3 cases ( 3*sizeof(float) ), et que la première est
-    // au début du bloc des normales après le bloc des positions ( 3*nbVertices * sizeof(float) ).
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)( 9*sizeof(float) ));
@@ -140,7 +130,7 @@ int main(int argc, char* argv[])
     ////////////////////////////////////////
 
 
-    Compound cubeCompo = Compound(vaoCube, cube.getNbVertices(), 0, cpltShader.getProgramID(), mat4(1.0f));
+    Compound cubeCompo = Compound(vaoCube, cube.getNbVertices(), 0, &cpltShader, mat4(1.0f));
 
 
     ////////////////////////////////////////
@@ -148,7 +138,7 @@ int main(int argc, char* argv[])
     ////////////////////////////////////////
     bool isOpened = true;
 
-    int DRAW_NUMBER = -1;
+    int DRAW_NUMBER = 1;
 
     mat4 modelMat;
     mat4 viewMat;
@@ -172,99 +162,93 @@ int main(int argc, char* argv[])
 
         // Time in ms telling us when this frame started. Useful for keeping a fix framerate
         uint32_t timeBegin = SDL_GetTicks();
-        
+
         // Treat inputs
         manageEvents(isOpened);
-        
+
         // Clear the screen : the depth buffer and the color buffer
         if (DRAW_NUMBER != 0) {
             glClearColor(0.25f, 0.23f, 0.40f, 1.0f);
             glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-        }
 
-        ////////////////////////////////////////
-        //    viewMat & projectionMat : cplt
-        ////////////////////////////////////////
-        
-        viewMat = mat4(1.0f);
-        viewMat = glm::rotate(viewMat, glm::quarter_pi<float>(), vec3(0.5f, 0.9f, 1.0f));
-        projectionMat = mat4(1.0f);
-        cpltShader.setMat4f("view", viewMat);
-        cpltShader.setMat4f("projection", projectionMat);
-
-
-        ////////////////////////////////////////
-        //        Cube compound test
-        ////////////////////////////////////////
-
-        cubeCompo.draw();
+            ////////////////////////////////////////
+            //    viewMat & projectionMat : cplt
+            ////////////////////////////////////////
+            
+            cpltShader.use();
+            viewMat = mat4(1.0f);
+            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>(), vec3(0.5f, 0.9f, 1.0f));
+            projectionMat = mat4(1.0f);
+            cpltShader.setMat4f("view", viewMat);
+            cpltShader.setMat4f("projection", projectionMat);
 
 
+            ////////////////////////////////////////
+            //        Cube compound test
+            ////////////////////////////////////////
 
-        ////////////////////////////////////////
-        //            Test cube
-        ////////////////////////////////////////
-        /*/
-        modelMat = mat4(1.0f);
-        viewMat = mat4(1.0f);
-        viewMat = glm::rotate(viewMat, glm::quarter_pi<float>(), vec3(0.5f, 0.9f, 1.0f));
-        projectionMat = mat4(1.0f);
-        location = glGetUniformLocation(cpltShader.getProgramID(), "model");
-        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(modelMat));
-        location = glGetUniformLocation(cpltShader.getProgramID(), "view");
-        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(viewMat));
-        location = glGetUniformLocation(cpltShader.getProgramID(), "projection");
-        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(projectionMat));
-        
-        cpltShader.use();
-        glBindVertexArray(vaoCube);
-        if (DRAW_NUMBER != 0) {
+            cubeCompo.draw();
+
+
+
+            ////////////////////////////////////////
+            //            Test cube
+            ////////////////////////////////////////
+            /*/
+            modelMat = mat4(1.0f);
+            viewMat = mat4(1.0f);
+            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>(), vec3(0.5f, 0.9f, 1.0f));
+            projectionMat = mat4(1.0f);
+            location = glGetUniformLocation(cpltShader.getProgramID(), "model");
+            glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(modelMat));
+            location = glGetUniformLocation(cpltShader.getProgramID(), "view");
+            glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(viewMat));
+            location = glGetUniformLocation(cpltShader.getProgramID(), "projection");
+            glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(projectionMat));
+
+            cpltShader.use();
+            glBindVertexArray(vaoCube);
             glDrawArrays(GL_TRIANGLES, 0, cube.getNbVertices());
-        }
-        
 
-        //////////////////////////////////////// */
-        //            Triangle
-        ////////////////////////////////////////
-        
-        modelMat = mat4(1.0f);
-        viewMat = mat4(1.0f);
-        projectionMat = mat4(1.0f);
-        location = glGetUniformLocation(cpltShader.getProgramID(), "model");
-        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(modelMat));
-        location = glGetUniformLocation(cpltShader.getProgramID(), "view");
-        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(viewMat));
-        location = glGetUniformLocation(cpltShader.getProgramID(), "projection");
-        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(projectionMat));
 
-        cpltShader.use();
-        glBindVertexArray(vaoTri);
-        if (DRAW_NUMBER != 0) {
+            //////////////////////////////////////// */
+            //            Triangle
+            ////////////////////////////////////////
+            /*
+            modelMat = mat4(1.0f);
+            viewMat = mat4(1.0f);
+            projectionMat = mat4(1.0f);
+            cpltShader.setMat4f("model", modelMat);
+            cpltShader.setMat4f("view", viewMat);
+            cpltShader.setMat4f("projection", projectionMat);
+
+            cpltShader.use();
+            glBindVertexArray(vaoTri);
             glDrawArrays(GL_TRIANGLES, 0, 3);
-        }
-        //////////////////////////////////////// */
-        //              Table
-        ////////////////////////////////////////
+            glUseProgram(0);
+            //////////////////////////////////////// */
+            //              Table
+            ////////////////////////////////////////
 
 
-        //TODO rendering
+            //TODO rendering
 
 
-        ////////////////////////////////////////
-        //          Other objects
-        ////////////////////////////////////////
+            ////////////////////////////////////////
+            //          Other objects
+            ////////////////////////////////////////
 
 
 
 
+        
         ////////////////////////////////////////
         //             Loop end
         ////////////////////////////////////////
 
-        // Display on screen (swap the buffer on screen and the buffer you are drawing on)
-        if(DRAW_NUMBER != 0)
+            // Display on screen (swap the buffer on screen and the buffer you are drawing on)
             SDL_GL_SwapWindow(window);
-
+        }
         if (DRAW_NUMBER > 0)
             DRAW_NUMBER--;
 
@@ -277,6 +261,7 @@ int main(int argc, char* argv[])
 
 
     }
+
 
     glDeleteBuffers(1, &vboCube);
 
