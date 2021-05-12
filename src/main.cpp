@@ -22,6 +22,12 @@
 #include "logger.h"
 
 
+
+
+
+// Temporary
+#include "glm/gtc/type_ptr.hpp"
+
 using std::cout;
 
 using glm::vec2;
@@ -31,7 +37,7 @@ using glm::mat3;
 using glm::mat4;
 
 
-#define WIDTH     800
+#define WIDTH     600
 #define HEIGHT    600
 #define FRAMERATE 60
 #define TIME_PER_FRAME_MS  (1.0f/FRAMERATE * 1e3)
@@ -48,19 +54,6 @@ int main(int argc, char* argv[])
     if (initializeOpenGL(window, context, WIDTH, HEIGHT) == false)
         return 0; // if initialization fails, the program can end here.
 
-    //TODO
-    //From here you can load your OpenGL objects, like VBO, Shaders, etc.
-    //TODO
-
-    ////////////////////////////////////////
-    //      Declaring loop variables
-    ////////////////////////////////////////
-
-    bool isOpened = true;
-
-    mat4 modelMat;
-    mat4 viewMat;
-    mat4 projectionMat;
 
 
     ///////////////////////////////////////////////////////////////////////
@@ -70,42 +63,127 @@ int main(int argc, char* argv[])
     ///////////////////////////////////////////////////////////////////////
     
     ////////////////////////////////////////
-    //             Cube VAO
+    //             Cube VAO                ----------------------------------------------------------------- Partie probablement problématique
     ////////////////////////////////////////
 
     GLuint vaoCube;
-    GLuint vboCube[3];
+    GLuint vboCube;
     glGenVertexArrays(1, &vaoCube);
-    glGenBuffers(3, vboCube);
+    glGenBuffers(1, &vboCube);
 
     Cube cube = Cube();
+    unsigned int nbVertices = cube.getNbVertices();
 
+
+
+    glBindBuffer(GL_ARRAY_BUFFER, vboCube);
+    glBufferData(GL_ARRAY_BUFFER, (3 + 3 + 2) * sizeof(float) * cube.getNbVertices(), NULL, GL_STATIC_DRAW);
+
+    // De ce que je comprends, ces 3 lignes vont remplir le buffer "vboCube" en mettant toutes les positions, puis toutes les normales, puis tous les UVs.
+    glBufferSubData(GL_ARRAY_BUFFER, 0                          , 3 * sizeof(float)*nbVertices, cube.getVertices());
+    glBufferSubData(GL_ARRAY_BUFFER, 3 * sizeof(float)*nbVertices, 3 * sizeof(float)*nbVertices, cube.getNormals());
+    glBufferSubData(GL_ARRAY_BUFFER, 6 * sizeof(float)*nbVertices, 2 * sizeof(float)*nbVertices, cube.getUVs());
+
+    
     glBindVertexArray(vaoCube);
-    glBindBuffer(GL_ARRAY_BUFFER, vboCube[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cube.getVertices()), cube.getVertices(), GL_STATIC_DRAW);
+    
+    // Je définis que l'emplacement mémoire 0 (celui utilisé explicitement dans cplt.vert) est pour les 3 positions, 1 pour les 3 normales, et 2 pour les 2 UVs.
+    // J'indique qu'ils sont en 3 "blocs homogènes" en disant par exemple que les normales sont 3, qu'il y en a un ensemble toutes les 3 cases ( 3*sizeof(float) ), et que la première est
+    // au début du bloc des normales après le bloc des positions ( 3*nbVertices * sizeof(float) ).
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vboCube[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cube.getNormals()), cube.getNormals(), GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(3*sizeof(float)*nbVertices));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(6*sizeof(float)*nbVertices));
+    glEnableVertexAttribArray(2);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vboCube[2]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cube.getUVs()), cube.getUVs(), GL_STATIC_DRAW);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+    
+
+
+    ////////////////////////////////////////
+    //          Imported cube VAO         ---------------- Un autre VBO de cube pour le test, qui range les attributs par point et non par type d'attribut. Le contraire du précédent.
+    ////////////////////////////////////////
+
+    float vertices4[] = {
+        // positions		// normals			// texture coords
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    GLuint VAO, VBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices4), vertices4, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
-    
 
     ////////////////////////////////////////
     //       Complete program (cplt)
     ////////////////////////////////////////
 
     Shader cpltShader;
-    //shader.loadFromFiles("C:\\Users\\user\\Documents\\Polytech\\ET3 (S2)\\Spé Informatique graphique\\Dice Project\\Shaders\\cplt.vert", "Initialization.cpp");
-    cpltShader.loadFromFiles("Shaders/cplt.vert", "Shaders/cplt.frag");
+    cpltShader = *cpltShader.loadFromFiles("Shaders/cplt.vert", "Shaders/cplt.frag");
+
+
+
+    ////////////////////////////////////////
+    //      Declaring loop variables
+    ////////////////////////////////////////
+    bool isOpened = true;
+    bool mustDraw = true;
+
+    mat4 modelMat;
+    mat4 viewMat;
+    mat4 projectionMat;
+
+    GLint location;
 
 
 
@@ -134,10 +212,47 @@ int main(int argc, char* argv[])
         ////////////////////////////////////////
         //            Test cube
         ////////////////////////////////////////
+        
+        modelMat = mat4(1.0f);
+        viewMat = mat4(1.0f);
+        projectionMat = mat4(1.0f);
+        location = glGetUniformLocation(cpltShader.getProgramID(), "model");
+        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(modelMat));
+        location = glGetUniformLocation(cpltShader.getProgramID(), "view");
+        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(viewMat));
+        location = glGetUniformLocation(cpltShader.getProgramID(), "projection");
+        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(projectionMat));
+        
         cpltShader.use();
         glBindVertexArray(vaoCube);
-        glDrawArrays(GL_STATIC_DRAW, 0, cube.getNbVertices());
+        if (mustDraw && true) { // J'ai mis ça pour que l'affichage se fasse une seule fois pour voir. Ca peut être retiré en remplaçant true par false ici.
+            glDrawArrays(GL_TRIANGLES, 0, cube.getNbVertices());
+            mustDraw = false;
+        }
+        
+        ////////////////////////////////////////
+        //            Test cube 2
+        ////////////////////////////////////////
+        
+        modelMat = mat4(1.0f);
+        modelMat = glm::translate(modelMat, vec3(0.5f, 0.5f, 0.5f));
+        modelMat = glm::rotate(modelMat, 1.0f, vec3(1.0f, 0.0f, 1.0f));
+        modelMat = glm::scale(modelMat, vec3(0.1f, 0.1f, 0.1f));
+        viewMat = mat4(1.0f);
+        projectionMat = mat4(1.0f);
+        location = glGetUniformLocation(cpltShader.getProgramID(), "model");
+        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(modelMat));
+        location = glGetUniformLocation(cpltShader.getProgramID(), "view");
+        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(viewMat));
+        location = glGetUniformLocation(cpltShader.getProgramID(), "projection");
+        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(projectionMat));
 
+        cpltShader.use();
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        
+
+        glBindVertexArray(0);
 
         ////////////////////////////////////////
         //              Table
@@ -167,7 +282,10 @@ int main(int argc, char* argv[])
         // We want FRAMERATE FPS
         if (timeEnd - timeBegin < TIME_PER_FRAME_MS)
             SDL_Delay(TIME_PER_FRAME_MS - (timeEnd - timeBegin));
+
     }
+
+    glDeleteBuffers(1, &vboCube);
 
     //Free everything
     if (context != NULL)
