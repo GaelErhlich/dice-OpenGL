@@ -3,11 +3,16 @@
 
 #define ERROR_MAX_LENGTH 500
 
+#include <string>
+#include <iostream>
+
 #include <GL/glew.h>
 #include <GL/gl.h>
-#include <iostream>
 #include <cstdlib>
 #include "logger.h"
+
+using std::string;
+
 
 /** \brief A graphic program.*/
 class Shader
@@ -48,6 +53,18 @@ class Shader
          * \return the Shader constructed or NULL if error
          * */
         static Shader* loadFromStrings(const std::string& vertexString, const std::string& fragString);
+        
+
+        void Shader::setBool(const string& name, bool value) const;
+        void Shader::setInt(const string& name, int value) const;
+        void Shader::setFloat(const string& name, float value) const;
+        void Shader::setVec2f(const string& name, glm::vec2 value) const;
+        void Shader::setVec3f(const string& name, glm::vec3 value) const;
+        void Shader::setVec4f(const string& name, glm::vec4 value) const;
+        void Shader::setMat3f(const string& name, glm::mat3 value) const;
+        void Shader::setMat4f(const string& name, glm::mat4 value) const;
+
+
     private:
         GLuint m_programID; /*!< The shader   program ID*/
         GLuint m_vertexID;  /*!< The vertex   shader  ID*/

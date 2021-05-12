@@ -1,8 +1,15 @@
 #ifndef  GEOMETRY_INC
 #define  GEOMETRY_INC
 
+#include <vector>
+
 #include <stdlib.h>
 #include <stdint.h>
+
+#include <GL/glew.h>
+
+using std::vector;
+
 
 /* \brief Represent a geometry*/
 class Geometry
@@ -29,11 +36,16 @@ class Geometry
          * \return the number of vertices this geometry contains*/
         uint32_t getNbVertices() const {return m_nbVertices;}
 
+
+        GLuint* getOneNewVAO(GLenum usage);
+
+
     protected: 
         uint32_t m_nbVertices = 0;
         float*   m_vertices   = NULL;
         float*   m_normals    = NULL;
         float*   m_uvs        = NULL;
+        vector<GLuint> VAOs;
 };
 
 #endif

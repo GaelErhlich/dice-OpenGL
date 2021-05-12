@@ -24,7 +24,8 @@ void main()
 {
 	worldCoord = vec3(model * vec4(aPos, 1.0));
 	//normalVec = normalize( vec3(rotModel * vec4(aNormal, 1.0)) );
-	normalVec = aNormal;
 	gl_Position = projection * view * vec4(worldCoord, 1.0f);
+	//gl_Position = vec4(aPos, 1.0);
+	normalVec = aNormal;
 	texCoord = aTexture;
 }
