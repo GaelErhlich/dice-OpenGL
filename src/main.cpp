@@ -152,12 +152,15 @@ int main(int argc, char* argv[])
     collider = body->addCollider(boxShape, identity);
 
 
+
+
+
     ////////////////////////////////////////
     //      Declaring loop variables
     ////////////////////////////////////////
     bool isOpened = true;
 
-    int DRAW_NUMBER = 1;
+    int DRAW_NUMBER = -1;
 
     mat4 modelMat;
     mat4 viewMat;
@@ -196,7 +199,7 @@ int main(int argc, char* argv[])
             
             cpltShader.use();
             viewMat = mat4(1.0f);
-            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>(), vec3(0.5f, 0.9f, 1.0f));
+            // viewMat = glm::rotate(viewMat, glm::quarter_pi<float>(), vec3(0.5f, 0.9f, 1.0f));
             projectionMat = mat4(1.0f);
             cpltShader.setMat4f("view", viewMat);
             cpltShader.setMat4f("projection", projectionMat);
@@ -211,7 +214,9 @@ int main(int argc, char* argv[])
             Transform currTransform = body->getTransform(); 
             float transformationMatrix[16];
             currTransform.getOpenGLMatrix(transformationMatrix);
-            cpltShader.setMat4f("model", glm::make_mat4(transformationMatrix));
+            const Vector3& tposition = currTransform.getPosition(); 
+            std::cout << "Body Position: (" << tposition.x << ", " << tposition.y << ", " << tposition.z << ")" << std::endl; 
+            cubeCompo.calculateModelMatrix(glm::make_mat4(transformationMatrix));
             cubeCompo.draw();
 
 
