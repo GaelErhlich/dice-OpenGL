@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
     ////////////////////////////////////////
 
     Shader cpltShader;
-    cpltShader = *cpltShader.loadFromFiles("Shaders/cplt.vert", "Shaders/cplt.frag");
+    cpltShader = *cpltShader.loadFromFiles("../Shaders/cplt.vert", "../Shaders/cplt.frag");
 
 
 
