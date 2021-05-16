@@ -42,6 +42,8 @@ bool initializeOpenGL(SDL_Window* &window, SDL_GLContext &context, int WIDTH, in
     glEnable(GL_DEPTH_TEST); //Active the depth test
     glDepthFunc(GL_LESS);
 
+
+
     return true;
 
 }

@@ -73,7 +73,6 @@ void Compound::draw() {
 	glBindVertexArray(vaoID);
 	if (textureID != 0) {
 		glActiveTexture(GL_TEXTURE0);
-		std::cout << textureID << "\n";
 		glBindTexture(GL_TEXTURE0, textureID);
 	}
 	shaderProgram->setMat4f("model", modelMatrix);

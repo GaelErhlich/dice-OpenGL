@@ -17,11 +17,11 @@
 
 #include "Shader.h"
 #include "Compound.hpp"
+#include "makeTexture.hpp"
 
 #include "Cube.h"
 
 #include "logger.h"
-#include "stb_image_implem.h"
 
 
 using namespace reactphysics3d;
@@ -52,17 +52,13 @@ using glm::mat4;
 int main(int argc, char* argv[])
 {
     ////////////////////////////////////////
-    //Physics initialization : 
+    //      Physics initialization : 
     ////////////////////////////////////////
 
     PhysicsCommon physicsCommon;
     PhysicsWorld::WorldSettings settings;
     settings.gravity = Vector3(0,-9.81, 0);
     PhysicsWorld* world = physicsCommon.createPhysicsWorld(settings);
-
-    
-
-
 
 
     ////////////////////////////////////////
@@ -75,10 +71,9 @@ int main(int argc, char* argv[])
         return 0; // if initialization fails, the program can end here.
 
 
-
-    
-    if(OUTLINE_MODE_ENABLED)
+    if (OUTLINE_MODE_ENABLED)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 
 
 
@@ -90,59 +85,11 @@ int main(int argc, char* argv[])
 
 
 
-    ////////////////////////////////////////
-    //Textures initialization : 
-    ////////////////////////////////////////
-    /*/
-    int textWidth, textHeight, textNrChannels;
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load("../textures/wall.jpg", &textWidth, &textHeight, &textNrChannels, 0);
-    GLuint texture1;
-    glGenTextures(1, &texture1);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-
-
-    // Paramètres de la texture
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textWidth, textHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    //glGenerateMipmap(GL_TEXTURE_2D);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-
     //////////////////////////////////////// */
-    // Test texture addition
+    //              Textures
     ////////////////////////////////////////
     
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char* imageData = stbi_load("../textures/wall.jpg", &width, &height, &nrChannels, 0);
-    if (!imageData) // Checking if the picture was successfully loaded
-        cout << "Failed to load texture1\n";
-
-
-    // Creating an OpenGL texture object
-    GLuint texture1;
-    glGenTextures(1, &texture1);
-    glBindTexture(GL_TEXTURE_2D, texture1); // On dit qu'on travaille sur texture1 maintenant, donc GL_TEXTURE_2D est texture1
-
-    // Paramètres de la texture
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-
-    // Mise des données en OpenGL texture object
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData); // On met réellement l'image dans texture1
-    glGenerateMipmap(GL_TEXTURE_2D); // On génère automatiquement la mipmap (les différentes résolutions d'images)
+    GLuint wallTex = makeTexture("../textures/wall.jpg");
 
 
 
@@ -160,7 +107,7 @@ int main(int argc, char* argv[])
     cube.getOneNewVAO(vaoCube, vboCube, GL_STATIC_DRAW);
 
    ////////////////////////////////////////
-   //             Triangle                
+   //         Debug triangle                
    ////////////////////////////////////////
 
     GLuint vaoTri;
@@ -222,6 +169,8 @@ int main(int argc, char* argv[])
 
     int DRAW_NUMBER = -1;
 
+    Transform prevTransform;
+
     mat4 modelMat;
     mat4 viewMat;
     mat4 projectionMat;
@@ -235,15 +184,15 @@ int main(int argc, char* argv[])
     ////////////////////////////////////////
 
 
-    Compound cubeCompo = Compound(vaoCube, cube.getNbVertices(), texture1, &cpltShader, mat4(1.0f));
+    Compound cubeCompo = Compound(vaoCube, cube.getNbVertices(), wallTex, &cpltShader, mat4(1.0f));
     modelMat = mat4(1.0f);
     modelMat = glm::scale(modelMat, vec3(1.0f, 0.05f, 1.0f));
-    Compound tableCompo = Compound(vaoCube, cube.getNbVertices(), texture1, &cpltShader, modelMat);
+    Compound tableCompo = Compound(vaoCube, cube.getNbVertices(), wallTex, &cpltShader, modelMat);
 
     modelMat = glm::scale(mat4(1.0f), vec3(0.1f, 0.5f, 0.1f));
     modelMat = glm::translate(modelMat, vec3(0.0f, -0.45f, 0.0f));
 
-    Compound tableLeg1Compo = Compound(vaoCube, cube.getNbVertices(), texture1, &cpltShader, modelMat);
+    Compound tableLeg1Compo = Compound(vaoCube, cube.getNbVertices(), wallTex, &cpltShader, modelMat);
     tableCompo.addChild(&tableLeg1Compo);
 
 
@@ -284,10 +233,8 @@ int main(int argc, char* argv[])
     //           ---------  APPLICATION MAIN LOOP  ---------
     //
     ///////////////////////////////////////////////////////////////////////
-    cpltShader.use();
-    cpltShader.setInt("texture1", 0);
-    std::cout<<"texture: "<<texture1;
-    Transform prevTransform;
+
+    
     while (isOpened)
     {
         ////////////////////////////////////////
@@ -327,47 +274,11 @@ int main(int argc, char* argv[])
             float transformationMatrixPCube[16];
             currTransformPCube.getOpenGLMatrix(transformationMatrixPCube);
             const Vector3& tposition = currTransformPCube.getPosition(); 
-            std::cout << "Cube Position: (" << tposition.x << ", " << tposition.y << ", " << tposition.z << ")" << std::endl; 
+            //std::cout << "Cube Position: (" << tposition.x << ", " << tposition.y << ", " << tposition.z << ")" << std::endl; 
             cubeCompo.calculateModelMatrix(glm::make_mat4(transformationMatrixPCube));
             cubeCompo.draw();
 
 
-
-            ////////////////////////////////////////
-            //            Test cube
-            ////////////////////////////////////////
-            /*/
-            modelMat = mat4(1.0f);
-            viewMat = mat4(1.0f);
-            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>(), vec3(0.5f, 0.9f, 1.0f));
-            projectionMat = mat4(1.0f);
-            location = glGetUniformLocation(cpltShader.getProgramID(), "model");
-            glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(modelMat));
-            location = glGetUniformLocation(cpltShader.getProgramID(), "view");
-            glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(viewMat));
-            location = glGetUniformLocation(cpltShader.getProgramID(), "projection");
-            glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(projectionMat));
-
-            cpltShader.use();
-            glBindVertexArray(vaoCube);
-            glDrawArrays(GL_TRIANGLES, 0, cube.getNbVertices());
-
-
-            //////////////////////////////////////// */
-            //            Triangle
-            ////////////////////////////////////////
-            /*
-            modelMat = mat4(1.0f);
-            viewMat = mat4(1.0f);
-            projectionMat = mat4(1.0f);
-            cpltShader.setMat4f("model", modelMat);
-            cpltShader.setMat4f("view", viewMat);
-            cpltShader.setMat4f("projection", projectionMat);
-
-            cpltShader.use();
-            glBindVertexArray(vaoTri);
-            glDrawArrays(GL_TRIANGLES, 0, 3);
-            glUseProgram(0);
             //////////////////////////////////////// */
             //              Table
             ////////////////////////////////////////
