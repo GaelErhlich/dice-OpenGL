@@ -54,8 +54,12 @@ int main(int argc, char* argv[])
     //Textures initialization : 
     ////////////////////////////////////////
     int textWidth, textHeight, textNrChannels;
-    unsigned char *data = stbi_load("./textures/texture-bois.jpeg", &textWidth, &textHeight, &textNrChannels, 0);
-
+    unsigned char *data = stbi_load("../textures/wall.jpg", &textWidth, &textHeight, &textNrChannels, 0);
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textWidth, textHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    // glGenerateMipmap(GL_TEXTURE_2D);
 
     ////////////////////////////////////////
     //SDL2 / OpenGL Context initialization : 
@@ -142,7 +146,6 @@ int main(int argc, char* argv[])
 
 
 
-
     ////////////////////////////////////////
     //      Declaring loop variables
     ////////////////////////////////////////
@@ -163,7 +166,7 @@ int main(int argc, char* argv[])
     ////////////////////////////////////////
 
 
-    Compound cubeCompo = Compound(vaoCube, cube.getNbVertices(), 0, &cpltShader, mat4(1.0f));
+    Compound cubeCompo = Compound(vaoCube, cube.getNbVertices(), texture, &cpltShader, mat4(1.0f));
     modelMat = mat4(1.0f);
     modelMat = glm::scale(modelMat, vec3(1.0f, 0.05f, 1.0f));
     Compound tableCompo = Compound(vaoCube, cube.getNbVertices(), 0, &cpltShader, modelMat);
@@ -212,6 +215,9 @@ int main(int argc, char* argv[])
     //           ---------  APPLICATION MAIN LOOP  ---------
     //
     ///////////////////////////////////////////////////////////////////////
+    cpltShader.use();
+    cpltShader.setInt("texture1", texture);
+    std::cout<<"texture: "<<texture;
     Transform prevTransform;
     while (isOpened)
     {
