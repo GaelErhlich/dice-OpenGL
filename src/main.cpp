@@ -21,6 +21,7 @@
 #include "Cube.h"
 
 #include "logger.h"
+#include "stb_image_implem.h"
 
 
 using namespace reactphysics3d;
@@ -49,6 +50,12 @@ int main(int argc, char* argv[])
     PhysicsWorld::WorldSettings settings;
     settings.gravity = Vector3(0,-9.81, 0);
     PhysicsWorld* world = physicsCommon.createPhysicsWorld(settings);
+    ////////////////////////////////////////
+    //Textures initialization : 
+    ////////////////////////////////////////
+    int textWidth, textHeight, textNrChannels;
+    unsigned char *data = stbi_load("./textures/texture-bois.jpeg", &textWidth, &textHeight, &textNrChannels, 0);
+
 
     ////////////////////////////////////////
     //SDL2 / OpenGL Context initialization : 
