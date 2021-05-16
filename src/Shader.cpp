@@ -129,6 +129,18 @@ int Shader::loadShader(const std::string& code, int type)
     return shader;
 }
 
+
+void Shader::enableTextureField(int i, char* uniformName) {
+    if (uniformName == "") {
+        string defaultName = "texture" + i;
+        this->setInt(defaultName, i);
+    }
+    else
+        this->setInt(uniformName, i);
+}
+
+
+
 void Shader::use() {
     glUseProgram(this->getProgramID());
 }

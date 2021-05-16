@@ -28,6 +28,7 @@ void manageEvents(bool &isOpened) {
             case SDL_KEYDOWN:
                 switch (event.key.keysym.sym)
                 {
+                //case SDLK_DOWN
                 case SDLK_ESCAPE:
                     isOpened = false;
                     break;

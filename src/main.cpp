@@ -39,6 +39,15 @@ using glm::mat4;
 #define TIME_PER_FRAME_MS  (1.0f/FRAMERATE * 1e3)
 #define INDICE_TO_PTR(x) ((void*)(x))
 
+
+
+////////////////////////////////////////
+//          Global variables
+////////////////////////////////////////
+
+
+
+
 int main(int argc, char* argv[])
 {
     ////////////////////////////////////////
@@ -132,6 +141,7 @@ int main(int argc, char* argv[])
 
     Shader cpltShader;
     cpltShader = *cpltShader.loadFromFiles("../Shaders/cplt.vert", "../Shaders/cplt.frag");
+    cpltShader.enableTextureField(0);
 
 
 

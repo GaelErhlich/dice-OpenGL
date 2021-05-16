@@ -54,7 +54,13 @@ class Shader
          * \return the Shader constructed or NULL if error
          * */
         static Shader* loadFromStrings(const std::string& vertexString, const std::string& fragString);
-        
+
+        /** \brief Matches the uniform name with a texture index within the shader
+        * \param i the index of the texture
+        * \param uniformName (optional) the uniform name inside the shader
+        * */
+        void enableTextureField(int i, char* uniformName="");
+
 
         void setBool(const string& name, bool value) const;
         void setInt(const string& name, int value) const;
