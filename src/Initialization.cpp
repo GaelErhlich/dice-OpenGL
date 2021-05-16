@@ -5,13 +5,14 @@
 #include <SDL2/SDL_syswm.h>
 #include <GL/glew.h>
 #include <GL/gl.h>
+#include <iostream>
 
 
 bool initializeOpenGL(SDL_Window* &window, SDL_GLContext &context, int WIDTH, int HEIGHT) {
     //Initialize SDL2
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0)
     {
-        ERROR("The initialization of the SDL failed : %s\n", SDL_GetError());
+        std::cout << "The initialization of the SDL failed : %s\n"<< SDL_GetError()<<std::endl;
         return false;
     }
 

@@ -11,8 +11,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY   ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 #C++11 in Debug mode
-set(CMAKE_BUILD_TYPE "Debug")
-set(CMAKE_CXX_STANDARD 11)
+#set(CMAKE_BUILD_TYPE "Debug")
+#set(CMAKE_CXX_STANDARD 11)
 
 #Some options
 #TODO add another option if a new library is to be added (follow this)
@@ -63,7 +63,7 @@ else()
     SET(SDL2_IMAGE_INCLUDE_PATH /usr/include/ CACHE PATH "Path to SDL2 IMAGE include location")
 
 
-    if((NOT EXISTS "${GL_LIBRARY_PATH}/libGL.so" ) AND (NOT EXISTS "${GL_LIBRARY_PATH}/GL.dll" ))
+    if((NOT EXISTS "${GL_LIBRARY_PATH}/x86_64-linux-gnu/libGL.so" ) AND (NOT EXISTS "${GL_LIBRARY_PATH}/GL.dll" ))
         MESSAGE(FATAL_ERROR "Could not find libGL in ${GL_LIBRARY_PATH}")
     endif()
 endif()
@@ -219,3 +219,11 @@ endforeach(srcfile)
 
 add_custom_target(ShaderTarget DEPENDS ${ShadersOutput})
 add_dependencies(Dice_Project ShaderTarget)
+
+if(WIN32) 
+  list(APPEND CMAKE_PREFIX_PATH "C:\\Program Files (x86)\\ReactPhysics3D") 
+elseif(APPLE) 
+  list(APPEND CMAKE_PREFIX_PATH "/usr/local/lib/cmake/ReactPhysics3D") 
+endif()
+find_package(ReactPhysics3D REQUIRED) 
+target_link_libraries(Dice_Project ReactPhysics3D::ReactPhysics3D)
