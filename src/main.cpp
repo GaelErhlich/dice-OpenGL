@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
     ////////////////////////////////////////
 
     Shader cpltShader;
-    cpltShader = *cpltShader.loadFromFiles("./Shaders/cplt.vert", "./Shaders/cplt.frag");
+    cpltShader = *cpltShader.loadFromFiles("../Shaders/cplt.vert", "../Shaders/cplt.frag");
 
 
 
@@ -157,6 +157,22 @@ int main(int argc, char* argv[])
 
 
     Compound cubeCompo = Compound(vaoCube, cube.getNbVertices(), 0, &cpltShader, mat4(1.0f));
+    modelMat = mat4(1.0f);
+    modelMat = glm::scale(modelMat, vec3(1.0f, 0.05f, 1.0f));
+    Compound tableCompo = Compound(vaoCube, cube.getNbVertices(), 0, &cpltShader, modelMat);
+
+    modelMat = glm::scale(mat4(1.0f), vec3(0.1f, 0.5f, 0.1f));
+    modelMat = glm::translate(modelMat, vec3(0.0f, -0.45f, 0.0f));
+
+    Compound tableLeg1Compo = Compound(vaoCube, cube.getNbVertices(), 0, &cpltShader, modelMat);
+    tableCompo.addChild(&tableLeg1Compo);
+
+
+
+
+
+
+
     Vector3 positionPCube(0.0, 0.0, 0.0);
     Quaternion orientationPCube = Quaternion::identity();
     Transform transformPCube(positionPCube, orientationPCube);
