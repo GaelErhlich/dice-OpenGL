@@ -16,7 +16,7 @@ class Compound
 public:
 
 	// Constructor
-	Compound(GLuint vaoI, size_t nbPoints, GLuint textureID, Shader* shader, mat4 relativeTransformation);
+	Compound(GLuint vaoI, size_t nbPoints, GLuint textureID, Shader* shader, mat4 relativeTransformation, mat4 relativeRotation);
 
 	// Destructor
 	~Compound();
@@ -29,12 +29,12 @@ public:
 	GLuint getVAO();
 	void setVAO(GLuint vaoID);
 
-	void setRelativeTransf(mat4 relativeTransformation);
+	void setRelativeTransf(mat4 relativeTransformation, mat4 relativeRotation);
 	mat4 getRelativeTransf();
 	bool isModelMatUpToDate();
 
 	/* Updates the (non-relative) model matrix of this compound based on its parent's model matrix */
-	void calculateModelMatrix(mat4 parentModelMatrix);
+	void calculateModelMatrix(mat4 parentModelMatrix, mat4 parentRotModelMatrix);
 
 
 	/*	Draws the current compound and its children, giving GPU the model matrix.
@@ -54,11 +54,13 @@ private:
 	size_t nbPoints = 0;
 	GLuint textureID = 0; // The OpenGL texture ID
 	mat4 modelMatrix = mat4(); // The matrix placing this compound, relatively to the world (could be calculated, but better stored)
+	mat4 rotModelMatrix = mat4(); // Same as above, but only rotations
 	Shader *shaderProgram = NULL;
 	
 	// Indicates if relativeTransf has been updated but not modelMatrix.
 	// If true, this compound's modelMatrix and all it's children's must be updated before the next render.
 	bool mustUpdateModelMat = true;
 	mat4 relativeTransf = mat4(1.0f); // The matrix placing this compound relatively to its parent compound
+	mat4 relativeRot = mat4(1.0f); // Same as above, but only rotations
 	vector<Compound> childNodes;
 };

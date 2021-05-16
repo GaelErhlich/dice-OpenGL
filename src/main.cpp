@@ -191,6 +191,7 @@ int main(int argc, char* argv[])
     Transform prevTransform;
 
     mat4 modelMat;
+    mat4 rotModelMat;
     mat4 viewMat;
     mat4 projectionMat;
 
@@ -202,7 +203,8 @@ int main(int argc, char* argv[])
     ////////////////////////////////////////
 
     modelMat = mat4(1.0f);
-    Compound cubeCompo = Compound(vaoPatronCube, cube.getNbVertices(), diceTex, &cpltShader, modelMat);
+    rotModelMat = mat4(1.0f);
+    Compound cubeCompo = Compound(vaoPatronCube, cube.getNbVertices(), diceTex, &cpltShader, modelMat, rotModelMat);
 
 
     ////////////////////////////////////////
@@ -210,13 +212,16 @@ int main(int argc, char* argv[])
     ////////////////////////////////////////
 
     modelMat = mat4(1.0f);
+    rotModelMat = mat4(1.0f);
     modelMat = glm::scale(modelMat, vec3(1.0f, 0.05f, 1.0f));
-    Compound tableCompo = Compound(vaoCube, cube.getNbVertices(), woodText, &cpltShader, modelMat);
+    Compound tableCompo = Compound(vaoCube, cube.getNbVertices(), woodText, &cpltShader, modelMat, rotModelMat);
 
+    modelMat = mat4(1.0f);
+    rotModelMat = mat4(1.0f);
     modelMat = glm::scale(mat4(1.0f), vec3(0.1f, 0.5f, 0.1f));
     modelMat = glm::translate(modelMat, vec3(0.0f, -0.45f, 0.0f));
 
-    Compound tableLeg1Compo = Compound(vaoCylinder, cylinder.getNbVertices(), wallTex, &cpltShader, modelMat);
+    Compound tableLeg1Compo = Compound(vaoCylinder, cylinder.getNbVertices(), wallTex, &cpltShader, modelMat, rotModelMat);
     tableCompo.addChild(&tableLeg1Compo);
 
 
@@ -288,11 +293,21 @@ int main(int argc, char* argv[])
             cpltShader.setMat4f("view", viewMat);
             cpltShader.setMat4f("projection", projectionMat);
 
+            // Light
+            cpltShader.setVec3f("ambientLight", vec3(0.05f, 0.05f, 0.05f));
+            cpltShader.setVec3f("lightColor", vec3(1.0f, 0.8f, 0.8f));
+            cpltShader.setVec3f("lightPos", vec3(0.0f, 1.0f, 0.0f));
+            cpltShader.setVec3f("cameraCoord", vec3(0.0f, 1.0f, 0.0f)); // A CHANGER POUR LA SPECULAR LIGHT
+            cpltShader.setFloat("specularStrength", 0.3);
+            
+
+
 
             ////////////////////////////////////////
             //        Cube compound test
             ////////////////////////////////////////
             // Constant physics time step 
+            
             const float timeStep = 1.0f / 60.0f; 
             world->update(timeStep); 
             Transform currTransformPCube = pCube->getTransform(); 
@@ -300,7 +315,7 @@ int main(int argc, char* argv[])
             currTransformPCube.getOpenGLMatrix(transformationMatrixPCube);
             const Vector3& tposition = currTransformPCube.getPosition(); 
             //std::cout << "Cube Position: (" << tposition.x << ", " << tposition.y << ", " << tposition.z << ")" << std::endl; 
-            cubeCompo.calculateModelMatrix(glm::make_mat4(transformationMatrixPCube));
+            cubeCompo.calculateModelMatrix(glm::make_mat4(transformationMatrixPCube), mat4(1.0f) ); // On ne peut pas donner la matrice de rotation à cubeCompo pour mettre à jour ses normales, donc on ne les mets pas à jour pour l'instant
             cubeCompo.draw();
 
 

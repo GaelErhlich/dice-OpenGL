@@ -4,12 +4,13 @@
 
 
 // Constructor
-Compound::Compound(GLuint vaoID, size_t nbPoints, GLuint textureID, Shader* shader, mat4 relativeTransformation)
+Compound::Compound(GLuint vaoID, size_t nbPoints, GLuint textureID, Shader* shader, mat4 relativeTransformation, mat4 relativeRotation)
 {
 	this->vaoID = vaoID;
 	this->nbPoints = nbPoints;
 	this->textureID = textureID;
 	this->relativeTransf = relativeTransformation;
+	this->relativeRot = relativeTransformation;
 	this->shaderProgram = shader;
 }
 
@@ -31,8 +32,9 @@ void Compound::setVAO(GLuint vaoID) {
 	this->vaoID = vaoID;
 }
 
-void Compound::setRelativeTransf(mat4 relativeTransformation) {
-	this->relativeTransf = relativeTransf;
+void Compound::setRelativeTransf(mat4 relativeTransformation, mat4 relativeRotation) {
+	this->relativeTransf = relativeTransformation;
+	this->relativeRot = relativeRotation;
 	this->mustUpdateModelMat = true;
 }
 mat4 Compound::getRelativeTransf() {
@@ -42,8 +44,9 @@ bool Compound::isModelMatUpToDate() {
 	return this->mustUpdateModelMat;
 }
 
-void Compound::calculateModelMatrix(mat4 parentModelMatrix) {
+void Compound::calculateModelMatrix(mat4 parentModelMatrix, mat4 parentRotModelMatrix) {
 	modelMatrix = parentModelMatrix * this->relativeTransf;
+	rotModelMatrix = parentRotModelMatrix * this->relativeRot;
 	this->mustUpdateModelMat = false;
 	this->calculateChildModelMatrices();
 }
@@ -51,7 +54,7 @@ void Compound::calculateModelMatrix(mat4 parentModelMatrix) {
 
 void Compound::calculateChildModelMatrices() {
 	for (Compound child : childNodes) {
-		child.calculateModelMatrix(this->modelMatrix);
+		child.calculateModelMatrix(this->modelMatrix, this->rotModelMatrix);
 	}
 }
 
@@ -64,6 +67,7 @@ void Compound::draw() {
 	// In other words, the virtual parent node is the world, making this task easy.
 	if (this->mustUpdateModelMat) {
 		this->modelMatrix = this->relativeTransf;
+		this->rotModelMatrix = this->relativeRot;
 	}
 
 
@@ -76,6 +80,7 @@ void Compound::draw() {
 		glBindTexture(GL_TEXTURE_2D, textureID);
 	}
 	shaderProgram->setMat4f("model", modelMatrix);
+	shaderProgram->setMat4f("rotModel", rotModelMatrix);
 	glDrawArrays(GL_TRIANGLES, 0, nbPoints);
 
 
@@ -90,7 +95,7 @@ void Compound::draw() {
 	else { // Case in which this node hasn't been edited, but maybe a child needs to be updated
 		for (Compound child : childNodes) {
 			if (child.mustUpdateModelMat)
-				child.calculateModelMatrix(this->modelMatrix);
+				child.calculateModelMatrix(this->modelMatrix, this->rotModelMatrix);
 		}
 	}
 
