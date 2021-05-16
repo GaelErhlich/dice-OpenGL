@@ -218,8 +218,10 @@ int main(int argc, char* argv[])
 
     modelMat = mat4(1.0f);
     rotModelMat = mat4(1.0f);
-    modelMat = glm::scale(mat4(1.0f), vec3(0.1f, 0.5f, 0.1f));
-    modelMat = glm::translate(modelMat, vec3(0.0f, -0.45f, 0.0f));
+    modelMat = glm::translate(modelMat, vec3(0.0f, -0.25f, 0.0f));
+    modelMat = glm::scale(modelMat, vec3(0.1f, 0.5f, 0.1f));
+    modelMat = glm::rotate(modelMat, glm::half_pi<float>(), vec3(1.0f, 0.0f, 0.0f));
+        rotModelMat = glm::rotate(rotModelMat, glm::half_pi<float>(), vec3(1.0f, 0.0f, 0.0f)); // A chaque fois qu'on fait une rotation sur une modelMat, on doit aussi la faire sur la rotModelMat
 
     Compound tableLeg1Compo = Compound(vaoCylinder, cylinder.getNbVertices(), wallTex, &cpltShader, modelMat, rotModelMat);
     tableCompo.addChild(&tableLeg1Compo);
