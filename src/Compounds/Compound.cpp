@@ -73,7 +73,7 @@ void Compound::draw() {
 	glBindVertexArray(vaoID);
 	if (textureID != 0) {
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE0, textureID);
+		glBindTexture(GL_TEXTURE_2D, textureID);
 	}
 	shaderProgram->setMat4f("model", modelMatrix);
 	glDrawArrays(GL_TRIANGLES, 0, nbPoints);

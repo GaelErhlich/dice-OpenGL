@@ -20,6 +20,7 @@
 #include "makeTexture.hpp"
 
 #include "Cube.h"
+#include "Cylinder.h"
 
 #include "logger.h"
 
@@ -106,6 +107,17 @@ int main(int argc, char* argv[])
     GLuint vaoCube, vboCube;
     cube.getOneNewVAO(vaoCube, vboCube, GL_STATIC_DRAW);
 
+
+    //////////////////////////////////////// */
+    //              Cylinder
+    ////////////////////////////////////////
+
+    Cylinder cylinder = Cylinder(128);
+    GLuint vaoCylinder, vboCylinder;
+    cylinder.getOneNewVAO(vaoCylinder, vboCylinder, GL_STATIC_DRAW);
+
+
+
    ////////////////////////////////////////
    //         Debug triangle                
    ////////////////////////////////////////
@@ -178,13 +190,17 @@ int main(int argc, char* argv[])
     GLint location;
 
 
-
     ////////////////////////////////////////
-    //             Compounds
+    //        Compound : some cube
     ////////////////////////////////////////
-
 
     Compound cubeCompo = Compound(vaoCube, cube.getNbVertices(), wallTex, &cpltShader, mat4(1.0f));
+
+
+    ////////////////////////////////////////
+    //          Compound : table
+    ////////////////////////////////////////
+
     modelMat = mat4(1.0f);
     modelMat = glm::scale(modelMat, vec3(1.0f, 0.05f, 1.0f));
     Compound tableCompo = Compound(vaoCube, cube.getNbVertices(), wallTex, &cpltShader, modelMat);
@@ -192,7 +208,7 @@ int main(int argc, char* argv[])
     modelMat = glm::scale(mat4(1.0f), vec3(0.1f, 0.5f, 0.1f));
     modelMat = glm::translate(modelMat, vec3(0.0f, -0.45f, 0.0f));
 
-    Compound tableLeg1Compo = Compound(vaoCube, cube.getNbVertices(), wallTex, &cpltShader, modelMat);
+    Compound tableLeg1Compo = Compound(vaoCylinder, cylinder.getNbVertices(), wallTex, &cpltShader, modelMat);
     tableCompo.addChild(&tableLeg1Compo);
 
 
@@ -258,7 +274,7 @@ int main(int argc, char* argv[])
             
             cpltShader.use();
             viewMat = mat4(1.0f);
-            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>(), vec3(0.5f, 0.9f, 1.0f));
+            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>(), vec3(-0.8f, 0.9f, 1.0f + std::fmod( (float) SDL_GetTicks()/1024.0f, 3.14f )-glm::pi<float>() ));
             projectionMat = mat4(1.0f);
             cpltShader.setMat4f("view", viewMat);
             cpltShader.setMat4f("projection", projectionMat);
