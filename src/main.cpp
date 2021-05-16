@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
     ////////////////////////////////////////
 
     Shader cpltShader;
-    cpltShader = *cpltShader.loadFromFiles("../Shaders/cplt.vert", "../Shaders/cplt.frag");
+    cpltShader = *cpltShader.loadFromFiles("./Shaders/cplt.vert", "./Shaders/cplt.frag");
 
 
 
@@ -157,34 +157,27 @@ int main(int argc, char* argv[])
 
 
     Compound cubeCompo = Compound(vaoCube, cube.getNbVertices(), 0, &cpltShader, mat4(1.0f));
-    
-    modelMat = mat4(1.0f);
-    modelMat = glm::scale(modelMat, vec3(1.0f, 0.05f, 1.0f) );
-    Compound tableCompo = Compound(vaoCube, cube.getNbVertices(), 0, &cpltShader, modelMat);
-
-    modelMat = glm::scale(mat4(1.0f), vec3(0.1f, 0.5f, 0.1f));
-    modelMat = glm::translate(modelMat, vec3(0.0f, -0.45f, 0.0f));
-    
-    Compound tableLeg1Compo = Compound(vaoCube, cube.getNbVertices(), 0, &cpltShader, modelMat);
-    tableCompo.addChild(&tableLeg1Compo);
-    
-
-
-
-
-
-
-
-
-    Vector3 position(0.0, 0.0, 0.0);
-    Quaternion orientation = Quaternion::identity();
-    Transform transform(position, orientation);
-    RigidBody* body = world->createRigidBody(transform);
-    const Vector3 halfExtents(0.5, 0.5, 0.5);
-    BoxShape* boxShape = physicsCommon.createBoxShape(halfExtents);
+    Vector3 positionPCube(0.0, 0.0, 0.0);
+    Quaternion orientationPCube = Quaternion::identity();
+    Transform transformPCube(positionPCube, orientationPCube);
+    RigidBody* pCube = world->createRigidBody(transformPCube);
+    pCube->setMass(0.1);
+    const Vector3 halfExtentsPCube(0.5, 0.5, 0.5);
+    BoxShape* boxShapePCube = physicsCommon.createBoxShape(halfExtentsPCube);
     Transform identity = Transform::identity();
-    Collider* collider;
-    collider = body->addCollider(boxShape, identity);
+    Collider* colliderPCube;
+    colliderPCube = pCube->addCollider(boxShapePCube, identity);
+
+    Vector3 positionPTable(0.0, -2, 0.0);
+    Quaternion orientationPTable = Quaternion::identity();
+    Transform transformPTable(positionPTable, orientationPTable);
+    RigidBody* pTable = world->createRigidBody(transformPTable);
+    pTable->setType(BodyType::STATIC);
+    const Vector3 halfExtentsPTable(10,0.1 , 10);
+    BoxShape* boxShapePTable = physicsCommon.createBoxShape(halfExtentsPTable);
+    Collider* colliderPTable;
+    colliderPTable = pTable->addCollider(boxShapePTable, identity);
+
 
 
 
@@ -232,12 +225,12 @@ int main(int argc, char* argv[])
             // Constant physics time step 
             const float timeStep = 1.0f / 60.0f; 
             world->update(timeStep); 
-            Transform currTransform = body->getTransform(); 
-            float transformationMatrix[16];
-            currTransform.getOpenGLMatrix(transformationMatrix);
-            const Vector3& tposition = currTransform.getPosition(); 
-            std::cout << "Body Position: (" << tposition.x << ", " << tposition.y << ", " << tposition.z << ")" << std::endl; 
-            cubeCompo.calculateModelMatrix(glm::make_mat4(transformationMatrix));
+            Transform currTransformPCube = pCube->getTransform(); 
+            float transformationMatrixPCube[16];
+            currTransformPCube.getOpenGLMatrix(transformationMatrixPCube);
+            const Vector3& tposition = currTransformPCube.getPosition(); 
+            std::cout << "Cube Position: (" << tposition.x << ", " << tposition.y << ", " << tposition.z << ")" << std::endl; 
+            cubeCompo.calculateModelMatrix(glm::make_mat4(transformationMatrixPCube));
             cubeCompo.draw();
 
 
