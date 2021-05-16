@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
     Collider* collider;
     collider = body->addCollider(boxShape, identity);
 
-    
+
 
 
 
