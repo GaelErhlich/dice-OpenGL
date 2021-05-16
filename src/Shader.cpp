@@ -132,7 +132,7 @@ int Shader::loadShader(const std::string& code, int type)
 
 void Shader::enableTextureField(int i, char* uniformName) {
     if (uniformName == "") {
-        string defaultName = "texture" + i;
+        string defaultName = "texture" + (i+1);
         this->setInt(defaultName, i);
     }
     else

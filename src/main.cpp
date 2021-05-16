@@ -59,16 +59,11 @@ int main(int argc, char* argv[])
     PhysicsWorld::WorldSettings settings;
     settings.gravity = Vector3(0,-9.81, 0);
     PhysicsWorld* world = physicsCommon.createPhysicsWorld(settings);
-    ////////////////////////////////////////
-    //Textures initialization : 
-    ////////////////////////////////////////
-    int textWidth, textHeight, textNrChannels;
-    unsigned char *data = stbi_load("../textures/wall.jpg", &textWidth, &textHeight, &textNrChannels, 0);
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textWidth, textHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    // glGenerateMipmap(GL_TEXTURE_2D);
+
+    
+
+
+
 
     ////////////////////////////////////////
     //SDL2 / OpenGL Context initialization : 
@@ -93,7 +88,70 @@ int main(int argc, char* argv[])
     //
     ///////////////////////////////////////////////////////////////////////
 
+
+
     ////////////////////////////////////////
+    //Textures initialization : 
+    ////////////////////////////////////////
+    /*/
+    int textWidth, textHeight, textNrChannels;
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char* data = stbi_load("../textures/wall.jpg", &textWidth, &textHeight, &textNrChannels, 0);
+    GLuint texture1;
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+
+
+    // Paramètres de la texture
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textWidth, textHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    //glGenerateMipmap(GL_TEXTURE_2D);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+
+    //////////////////////////////////////// */
+    // Test texture addition
+    ////////////////////////////////////////
+    
+    int width, height, nrChannels;
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char* imageData = stbi_load("../textures/wall.jpg", &width, &height, &nrChannels, 0);
+    if (!imageData) // Checking if the picture was successfully loaded
+        cout << "Failed to load texture1\n";
+
+
+    // Creating an OpenGL texture object
+    GLuint texture1;
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1); // On dit qu'on travaille sur texture1 maintenant, donc GL_TEXTURE_2D est texture1
+
+    // Paramètres de la texture
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+
+    // Mise des données en OpenGL texture object
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData); // On met réellement l'image dans texture1
+    glGenerateMipmap(GL_TEXTURE_2D); // On génère automatiquement la mipmap (les différentes résolutions d'images)
+
+
+
+
+
+
+
+
+    //////////////////////////////////////// */
     //              Cube
     ////////////////////////////////////////
 
@@ -152,6 +210,7 @@ int main(int argc, char* argv[])
 
     Shader cpltShader;
     cpltShader = *cpltShader.loadFromFiles("../Shaders/cplt.vert", "../Shaders/cplt.frag");
+    cpltShader.use();
     cpltShader.enableTextureField(0);
 
 
@@ -176,15 +235,15 @@ int main(int argc, char* argv[])
     ////////////////////////////////////////
 
 
-    Compound cubeCompo = Compound(vaoCube, cube.getNbVertices(), texture, &cpltShader, mat4(1.0f));
+    Compound cubeCompo = Compound(vaoCube, cube.getNbVertices(), texture1, &cpltShader, mat4(1.0f));
     modelMat = mat4(1.0f);
     modelMat = glm::scale(modelMat, vec3(1.0f, 0.05f, 1.0f));
-    Compound tableCompo = Compound(vaoCube, cube.getNbVertices(), 0, &cpltShader, modelMat);
+    Compound tableCompo = Compound(vaoCube, cube.getNbVertices(), texture1, &cpltShader, modelMat);
 
     modelMat = glm::scale(mat4(1.0f), vec3(0.1f, 0.5f, 0.1f));
     modelMat = glm::translate(modelMat, vec3(0.0f, -0.45f, 0.0f));
 
-    Compound tableLeg1Compo = Compound(vaoCube, cube.getNbVertices(), 0, &cpltShader, modelMat);
+    Compound tableLeg1Compo = Compound(vaoCube, cube.getNbVertices(), texture1, &cpltShader, modelMat);
     tableCompo.addChild(&tableLeg1Compo);
 
 
@@ -226,8 +285,8 @@ int main(int argc, char* argv[])
     //
     ///////////////////////////////////////////////////////////////////////
     cpltShader.use();
-    cpltShader.setInt("texture1", texture);
-    std::cout<<"texture: "<<texture;
+    cpltShader.setInt("texture1", 0);
+    std::cout<<"texture: "<<texture1;
     Transform prevTransform;
     while (isOpened)
     {
