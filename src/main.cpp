@@ -92,6 +92,7 @@ int main(int argc, char* argv[])
     
     GLuint woodText = makeTexture("../textures/wood.jpg");
     GLuint wallTex = makeTexture("../textures/wall.jpg");
+    GLuint diceTex = makeTexture("../textures/Dice.jpg");
 
 
 
@@ -101,12 +102,17 @@ int main(int argc, char* argv[])
 
 
     //////////////////////////////////////// */
-    //              Cube
+    //              Cubes
     ////////////////////////////////////////
 
     Cube cube = Cube();
     GLuint vaoCube, vboCube;
     cube.getOneNewVAO(vaoCube, vboCube, GL_STATIC_DRAW);
+
+    GLuint vaoPatronCube, vboPatronCube;
+    cube.setUvArray("4x4-patron-down-left");
+    cube.getOneNewVAO(vaoPatronCube, vboPatronCube, GL_STATIC_DRAW);
+    
 
 
     //////////////////////////////////////// */
@@ -195,7 +201,8 @@ int main(int argc, char* argv[])
     //        Compound : some cube
     ////////////////////////////////////////
 
-    Compound cubeCompo = Compound(vaoCube, cube.getNbVertices(), wallTex, &cpltShader, mat4(1.0f));
+    modelMat = mat4(1.0f);
+    Compound cubeCompo = Compound(vaoPatronCube, cube.getNbVertices(), diceTex, &cpltShader, modelMat);
 
 
     ////////////////////////////////////////
@@ -275,7 +282,8 @@ int main(int argc, char* argv[])
             
             cpltShader.use();
             viewMat = mat4(1.0f);
-            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>(), vec3(0.5f, 0.9f, 1.0f));
+            viewMat = glm::translate(viewMat, vec3(0.5f, 0.5f, 0.5f));
+            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>() * ((float)SDL_GetTicks() / 1000), vec3(0.5f, 0.9f, 0.5f));
             projectionMat = mat4(1.0f);
             cpltShader.setMat4f("view", viewMat);
             cpltShader.setMat4f("projection", projectionMat);

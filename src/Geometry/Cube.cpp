@@ -1,5 +1,9 @@
 #include "Cube.h"
 
+#include <iostream>
+
+using std::cout;
+
 Cube::Cube() : Geometry()
 {
     m_vertices = (float*)malloc(sizeof(float)*3*36);
@@ -160,4 +164,65 @@ Cube::Cube() : Geometry()
     for(uint32_t i = 0; i < 2*36; i++)
         m_uvs[i] = uvs[i];
     m_nbVertices = 36;
+}
+
+
+void Cube::setUvArray(string name) {
+    
+
+    if(name == "4x4-patron-down-left") {
+        float uvs[2 * 36] = {
+            //Front (5)
+            0.0, 0.0,
+            0.25, 0.0,
+            0.25, 0.25,
+            0.0, 0.0,
+            0.25, 0.25,
+            0.0, 0.25,
+
+            //Back (2)
+            0.5, 0.0,
+            0.75,  0.25,
+            0.75, 0.0,
+            0.5, 0.0,
+            0.5,  0.25,
+            0.75,  0.25,
+            
+             //Left (4)
+             0.25,  1.0,
+             0.25, 0.75,
+              0.5, 0.75,
+             0.25,  1.0,
+             0.5, 0.75,
+             0.5,  1.0,
+
+              //Right (3)
+              0.25,  0.5,
+               0.5, 0.25,
+              0.25, 0.25,
+              0.25,  0.5,
+               0.5,  0.5,
+               0.5, 0.25,
+
+               //Top (1)
+               0.5, 0.5,
+               0.25, 0.5,
+               0.25,  0.75,
+               0.5, 0.5,
+               0.25,  0.75,
+               0.5,  0.75,
+
+                //Bottom (6)
+                0.5, 0.0,
+                0.25,  0.25,
+                0.25, 0.0,
+                0.5, 0.0,
+                0.5,  0.25,
+                0.25,  0.25 };
+        for (uint32_t i = 0; i < 2 * 36; i++)
+            m_uvs[i] = uvs[i];
+    }
+    else {
+        cout << "Wrong name for cube UV array : " << name << "\n";
+    }
 }
