@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
     ////////////////////////////////////////
     
     GLuint woodText = makeTexture("../textures/wood.jpg");
-    GLuint cubeText = makeTexture("../textures/wall.jpg");
+    GLuint wallTex = makeTexture("../textures/wall.jpg");
 
 
 
