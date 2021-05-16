@@ -11,8 +11,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY   ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 #C++11 in Debug mode
-#set(CMAKE_BUILD_TYPE "Debug")
-#set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_BUILD_TYPE "Debug")
+set(CMAKE_CXX_STANDARD 11)
 
 #Some options
 #TODO add another option if a new library is to be added (follow this)
@@ -111,7 +111,7 @@ file(GLOB_RECURSE HEADERS include/*.h include/*.hpp)
 
 #TODO add the library path here
 link_directories(${SDL2_LIBRARY_PATH} ${GLEW_LIBRARY_PATH} ${SDL2_IMAGE_LIBRARY_PATH})
-add_executable(Dice_Project ${SRCS} ${HEADERS} "src/Initialization.cpp" "include/Initialization.hpp" "src/EventsManager.cpp" "include/EventsManager.hpp" "src/Compounds/Compound.cpp" "include/Compound.hpp"  )
+add_executable(Dice_Project ${SRCS} ${HEADERS})
 target_compile_definitions(Dice_Project PUBLIC _USE_MATH_DEFINES)
 
 #TODO add another -I parameter (include directory to take account to) and a -l parameter (libraries to link to)
@@ -219,11 +219,11 @@ endforeach(srcfile)
 
 add_custom_target(ShaderTarget DEPENDS ${ShadersOutput})
 add_dependencies(Dice_Project ShaderTarget)
-
 if(WIN32) 
   list(APPEND CMAKE_PREFIX_PATH "C:\\Program Files (x86)\\ReactPhysics3D") 
 elseif(APPLE) 
   list(APPEND CMAKE_PREFIX_PATH "/usr/local/lib/cmake/ReactPhysics3D") 
 endif()
 find_package(ReactPhysics3D REQUIRED) 
-target_link_libraries(Dice_Project ReactPhysics3D::ReactPhysics3D)
+target_link_libraries(Dice_Project ReactPhysics3D::ReactPhysics3D) 
+

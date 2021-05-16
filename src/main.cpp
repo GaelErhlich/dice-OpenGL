@@ -1,3 +1,4 @@
+#include <reactphysics3d/reactphysics3d.h> 
 //SDL Libraries
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
@@ -20,8 +21,6 @@
 #include "Cube.h"
 
 #include "logger.h"
-#include <glm/gtc/type_ptr.hpp>
-#include <reactphysics3d/reactphysics3d.h> 
 
 
 using namespace reactphysics3d;
