@@ -56,14 +56,14 @@ class Shader
         static Shader* loadFromStrings(const std::string& vertexString, const std::string& fragString);
         
 
-        void Shader::setBool(const string& name, bool value) const;
-        void Shader::setInt(const string& name, int value) const;
-        void Shader::setFloat(const string& name, float value) const;
-        void Shader::setVec2f(const string& name, glm::vec2 value) const;
-        void Shader::setVec3f(const string& name, glm::vec3 value) const;
-        void Shader::setVec4f(const string& name, glm::vec4 value) const;
-        void Shader::setMat3f(const string& name, glm::mat3 value) const;
-        void Shader::setMat4f(const string& name, glm::mat4 value) const;
+        void setBool(const string& name, bool value) const;
+        void setInt(const string& name, int value) const;
+        void setFloat(const string& name, float value) const;
+        void setVec2f(const string& name, glm::vec2 value) const;
+        void setVec3f(const string& name, glm::vec3 value) const;
+        void setVec4f(const string& name, glm::vec4 value) const;
+        void setMat3f(const string& name, glm::mat3 value) const;
+        void setMat4f(const string& name, glm::mat4 value) const;
 
 
     private:

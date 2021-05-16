@@ -1,3 +1,4 @@
+#include <reactphysics3d/reactphysics3d.h> 
 //SDL Libraries
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
@@ -22,8 +23,8 @@
 #include "logger.h"
 
 
+using namespace reactphysics3d;
 using std::cout;
-
 using glm::vec2;
 using glm::vec3;
 using glm::vec4;
@@ -40,6 +41,15 @@ using glm::mat4;
 
 int main(int argc, char* argv[])
 {
+    ////////////////////////////////////////
+    //Physics initialization : 
+    ////////////////////////////////////////
+
+    PhysicsCommon physicsCommon;
+    PhysicsWorld::WorldSettings settings;
+    settings.gravity = Vector3(0,-9.81, 0);
+    PhysicsWorld* world = physicsCommon.createPhysicsWorld(settings);
+
     ////////////////////////////////////////
     //SDL2 / OpenGL Context initialization : 
     ////////////////////////////////////////
@@ -131,6 +141,15 @@ int main(int argc, char* argv[])
 
 
     Compound cubeCompo = Compound(vaoCube, cube.getNbVertices(), 0, &cpltShader, mat4(1.0f));
+    Vector3 position(0.0, 0.0, 0.0);
+    Quaternion orientation = Quaternion::identity();
+    Transform transform(position, orientation);
+    RigidBody* body = world->createRigidBody(transform);
+    const Vector3 halfExtents(0.5, 0.5, 0.5);
+    BoxShape* boxShape = physicsCommon.createBoxShape(halfExtents);
+    Transform identity = Transform::identity();
+    Collider* collider;
+    collider = body->addCollider(boxShape, identity);
 
 
     ////////////////////////////////////////
@@ -153,7 +172,7 @@ int main(int argc, char* argv[])
     //           ---------  APPLICATION MAIN LOOP  ---------
     //
     ///////////////////////////////////////////////////////////////////////
-
+    Transform prevTransform;
     while (isOpened)
     {
         ////////////////////////////////////////
@@ -186,7 +205,13 @@ int main(int argc, char* argv[])
             ////////////////////////////////////////
             //        Cube compound test
             ////////////////////////////////////////
-
+            // Constant physics time step 
+            const float timeStep = 1.0f / 60.0f; 
+            world->update(timeStep); 
+            Transform currTransform = body->getTransform(); 
+            float transformationMatrix[16];
+            currTransform.getOpenGLMatrix(transformationMatrix);
+            cpltShader.setMat4f("model", glm::make_mat4(transformationMatrix));
             cubeCompo.draw();
 
 
