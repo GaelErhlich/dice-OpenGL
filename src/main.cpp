@@ -90,7 +90,8 @@ int main(int argc, char* argv[])
     //              Textures
     ////////////////////////////////////////
     
-    GLuint wallTex = makeTexture("../textures/wall.jpg");
+    GLuint woodText = makeTexture("../textures/wood.jpg");
+    GLuint cubeText = makeTexture("../textures/wall.jpg");
 
 
 
@@ -203,7 +204,7 @@ int main(int argc, char* argv[])
 
     modelMat = mat4(1.0f);
     modelMat = glm::scale(modelMat, vec3(1.0f, 0.05f, 1.0f));
-    Compound tableCompo = Compound(vaoCube, cube.getNbVertices(), wallTex, &cpltShader, modelMat);
+    Compound tableCompo = Compound(vaoCube, cube.getNbVertices(), woodText, &cpltShader, modelMat);
 
     modelMat = glm::scale(mat4(1.0f), vec3(0.1f, 0.5f, 0.1f));
     modelMat = glm::translate(modelMat, vec3(0.0f, -0.45f, 0.0f));
@@ -274,7 +275,7 @@ int main(int argc, char* argv[])
             
             cpltShader.use();
             viewMat = mat4(1.0f);
-            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>(), vec3(-0.8f, 0.9f, 1.0f + std::fmod( (float) SDL_GetTicks()/1024.0f, 3.14f )-glm::pi<float>() ));
+            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>(), vec3(0.5f, 0.9f, 1.0f));
             projectionMat = mat4(1.0f);
             cpltShader.setMat4f("view", viewMat);
             cpltShader.setMat4f("projection", projectionMat);
