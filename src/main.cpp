@@ -135,25 +135,6 @@ int main(int argc, char* argv[])
 
 
 
-    ////////////////////////////////////////
-    //             Compounds
-    ////////////////////////////////////////
-
-
-    Compound cubeCompo = Compound(vaoCube, cube.getNbVertices(), 0, &cpltShader, mat4(1.0f));
-    Vector3 position(0.0, 0.0, 0.0);
-    Quaternion orientation = Quaternion::identity();
-    Transform transform(position, orientation);
-    RigidBody* body = world->createRigidBody(transform);
-    const Vector3 halfExtents(0.5, 0.5, 0.5);
-    BoxShape* boxShape = physicsCommon.createBoxShape(halfExtents);
-    Transform identity = Transform::identity();
-    Collider* collider;
-    collider = body->addCollider(boxShape, identity);
-
-
-
-
 
     ////////////////////////////////////////
     //      Declaring loop variables
@@ -167,6 +148,46 @@ int main(int argc, char* argv[])
     mat4 projectionMat;
 
     GLint location;
+
+
+
+    ////////////////////////////////////////
+    //             Compounds
+    ////////////////////////////////////////
+
+
+    Compound cubeCompo = Compound(vaoCube, cube.getNbVertices(), 0, &cpltShader, mat4(1.0f));
+    
+    modelMat = mat4(1.0f);
+    modelMat = glm::scale(modelMat, vec3(1.0f, 0.05f, 1.0f) );
+    Compound tableCompo = Compound(vaoCube, cube.getNbVertices(), 0, &cpltShader, modelMat);
+
+    modelMat = glm::scale(mat4(1.0f), vec3(0.1f, 0.5f, 0.1f));
+    modelMat = glm::translate(modelMat, vec3(0.0f, -0.45f, 0.0f));
+    
+    Compound tableLeg1Compo = Compound(vaoCube, cube.getNbVertices(), 0, &cpltShader, modelMat);
+    tableCompo.addChild(&tableLeg1Compo);
+    
+
+
+
+
+
+
+
+
+    Vector3 position(0.0, 0.0, 0.0);
+    Quaternion orientation = Quaternion::identity();
+    Transform transform(position, orientation);
+    RigidBody* body = world->createRigidBody(transform);
+    const Vector3 halfExtents(0.5, 0.5, 0.5);
+    BoxShape* boxShape = physicsCommon.createBoxShape(halfExtents);
+    Transform identity = Transform::identity();
+    Collider* collider;
+    collider = body->addCollider(boxShape, identity);
+
+
+
 
 
 
@@ -199,7 +220,7 @@ int main(int argc, char* argv[])
             
             cpltShader.use();
             viewMat = mat4(1.0f);
-            // viewMat = glm::rotate(viewMat, glm::quarter_pi<float>(), vec3(0.5f, 0.9f, 1.0f));
+            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>(), vec3(0.5f, 0.9f, 1.0f));
             projectionMat = mat4(1.0f);
             cpltShader.setMat4f("view", viewMat);
             cpltShader.setMat4f("projection", projectionMat);
@@ -261,7 +282,7 @@ int main(int argc, char* argv[])
             ////////////////////////////////////////
 
 
-            //TODO rendering
+            tableCompo.draw();
 
 
             ////////////////////////////////////////

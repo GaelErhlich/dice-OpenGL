@@ -14,6 +14,9 @@ Compound::Compound(GLuint vaoID, size_t nbPoints, GLuint textureID, Shader* shad
 }
 
 // Getters & setters
+void Compound::addChild(Compound* child) {
+	childNodes.push_back(*child);
+}
 Compound Compound::getChild(int i) {
 	return childNodes[i];
 }
@@ -31,6 +34,9 @@ void Compound::setVAO(GLuint vaoID) {
 void Compound::setRelativeTransf(mat4 relativeTransformation) {
 	this->relativeTransf = relativeTransf;
 	this->mustUpdateModelMat = true;
+}
+mat4 Compound::getRelativeTransf() {
+	return mat4(this->relativeTransf);
 }
 bool Compound::isModelMatUpToDate() {
 	return this->mustUpdateModelMat;

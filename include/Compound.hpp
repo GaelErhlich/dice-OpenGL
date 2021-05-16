@@ -23,12 +23,14 @@ public:
 
 	// Getters & setters
 	Compound getChild(int i);
+	void addChild(Compound* child);
 	void setChild(Compound *child, int i);
 
 	GLuint getVAO();
 	void setVAO(GLuint vaoID);
 
 	void setRelativeTransf(mat4 relativeTransformation);
+	mat4 getRelativeTransf();
 	bool isModelMatUpToDate();
 
 	/* Updates the (non-relative) model matrix of this compound based on its parent's model matrix */
