@@ -203,6 +203,7 @@ int main(int argc, char* argv[])
     ////////////////////////////////////////
 
     modelMat = mat4(1.0f);
+    modelMat = glm::scale(modelMat, vec3(0.1f, 0.1f, 0.1f));
     rotModelMat = mat4(1.0f);
     Compound cubeCompo = Compound(vaoPatronCube, cube.getNbVertices(), diceTex, &cpltShader, modelMat, rotModelMat);
 
@@ -213,13 +214,13 @@ int main(int argc, char* argv[])
 
     modelMat = mat4(1.0f);
     rotModelMat = mat4(1.0f);
-    modelMat = glm::scale(modelMat, vec3(1.0f, 0.05f, 1.0f));
+    modelMat = glm::scale(modelMat, vec3(2.5f, 0.05f, 2.5f));
     Compound tableCompo = Compound(vaoCube, cube.getNbVertices(), woodText, &cpltShader, modelMat, rotModelMat);
 
     modelMat = mat4(1.0f);
     rotModelMat = mat4(1.0f);
-    modelMat = glm::translate(modelMat, vec3(0.0f, -0.25f, 0.0f));
-    modelMat = glm::scale(modelMat, vec3(0.1f, 0.5f, 0.1f));
+    modelMat = glm::translate(modelMat, vec3(0.0f, -1.25f, 0.0f));
+    modelMat = glm::scale(modelMat, vec3(0.1f, 2.5f, 0.1f));
     modelMat = glm::rotate(modelMat, glm::half_pi<float>(), vec3(1.0f, 0.0f, 0.0f));
         rotModelMat = glm::rotate(rotModelMat, glm::half_pi<float>(), vec3(1.0f, 0.0f, 0.0f)); // A chaque fois qu'on fait une rotation sur une modelMat, on doit aussi la faire sur la rotModelMat
 
@@ -232,23 +233,23 @@ int main(int argc, char* argv[])
 
 
 
-    Vector3 positionPCube(0.0, 0.0, 0.0);
+    Vector3 positionPCube(0.0, 5.0, 0.0);
     Quaternion orientationPCube = Quaternion::identity();
     Transform transformPCube(positionPCube, orientationPCube);
     RigidBody* pCube = world->createRigidBody(transformPCube);
     pCube->setMass(0.1);
-    const Vector3 halfExtentsPCube(0.5, 0.5, 0.5);
+    const Vector3 halfExtentsPCube(0.05, 0.05, 0.05);
     BoxShape* boxShapePCube = physicsCommon.createBoxShape(halfExtentsPCube);
     Transform identity = Transform::identity();
     Collider* colliderPCube;
     colliderPCube = pCube->addCollider(boxShapePCube, identity);
 
-    Vector3 positionPTable(0.0, -2, 0.0);
+    Vector3 positionPTable(0.0, -0.05, 0.0);
     Quaternion orientationPTable = Quaternion::identity();
     Transform transformPTable(positionPTable, orientationPTable);
     RigidBody* pTable = world->createRigidBody(transformPTable);
     pTable->setType(BodyType::STATIC);
-    const Vector3 halfExtentsPTable(10,0.1 , 10);
+    const Vector3 halfExtentsPTable(10,0.075 , 10);
     BoxShape* boxShapePTable = physicsCommon.createBoxShape(halfExtentsPTable);
     Collider* colliderPTable;
     colliderPTable = pTable->addCollider(boxShapePTable, identity);
@@ -265,6 +266,13 @@ int main(int argc, char* argv[])
     //
     ///////////////////////////////////////////////////////////////////////
 
+    Vector3 force(3, 2, -3.0); 
+    // Apply a force to the center of the cube 
+    pCube->applyForceToCenterOfMass(force);
+
+    Vector3 torque(2.0, 3.0, 1.5); 
+    // Apply a torque to the cube
+    pCube->applyTorque(torque); 
     
     while (isOpened)
     {
@@ -286,11 +294,13 @@ int main(int argc, char* argv[])
             ////////////////////////////////////////
             //    viewMat & projectionMat : cplt
             ////////////////////////////////////////
+            // Force vector (in Newton) 
             
             cpltShader.use();
             viewMat = mat4(1.0f);
-            viewMat = glm::translate(viewMat, vec3(0.5f, 0.5f, 0.5f));
-            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>() * ((float)SDL_GetTicks() / 1000), vec3(0.5f, 0.9f, 0.5f));
+            //viewMat = glm::translate(viewMat, vec3(0.0f, f, 0.0f));
+            //viewMat = glm::rotate(viewMat, glm::quarter_pi<float>() * ((float)SDL_GetTicks() / 1000), vec3(0.5f, 0.9f, 0.5f));
+            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>() * 0.75f, vec3(-1.0f, 1.0f, 0.0f));
             projectionMat = mat4(1.0f);
             cpltShader.setMat4f("view", viewMat);
             cpltShader.setMat4f("projection", projectionMat);
@@ -317,7 +327,7 @@ int main(int argc, char* argv[])
             currTransformPCube.getOpenGLMatrix(transformationMatrixPCube);
             const Vector3& tposition = currTransformPCube.getPosition(); 
             //std::cout << "Cube Position: (" << tposition.x << ", " << tposition.y << ", " << tposition.z << ")" << std::endl; 
-            cubeCompo.calculateModelMatrix(glm::make_mat4(transformationMatrixPCube), mat4(1.0f) ); // On ne peut pas donner la matrice de rotation à cubeCompo pour mettre à jour ses normales, donc on ne les mets pas à jour pour l'instant
+            cubeCompo.calculateModelMatrix(glm::make_mat4(transformationMatrixPCube), mat4(1.0f) ); // On ne peut pas donner la matrice de rotation ï¿½ cubeCompo pour mettre ï¿½ jour ses normales, donc on ne les mets pas ï¿½ jour pour l'instant
             cubeCompo.draw();
 
 
