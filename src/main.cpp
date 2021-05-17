@@ -21,6 +21,7 @@
 
 #include "Cube.h"
 #include "Cylinder.h"
+#include <time.h>
 
 #include "logger.h"
 
@@ -265,12 +266,12 @@ int main(int argc, char* argv[])
     //           ---------  APPLICATION MAIN LOOP  ---------
     //
     ///////////////////////////////////////////////////////////////////////
-
-    Vector3 force(3, 2, -3.0); 
+    srand (time(NULL));
+    Vector3 force(rand()%7-3, rand()%7-3, rand()%7-3); 
     // Apply a force to the center of the cube 
     pCube->applyForceToCenterOfMass(force);
 
-    Vector3 torque(2.0, 3.0, 1.5); 
+    Vector3 torque(rand()%7-3, rand()%7-3,rand()%7-3); 
     // Apply a torque to the cube
     pCube->applyTorque(torque); 
     
