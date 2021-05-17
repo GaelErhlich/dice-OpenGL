@@ -17,7 +17,7 @@ bool initializeOpenGL(SDL_Window* &window, SDL_GLContext &context, int WIDTH, in
     }
 
     //Create a Window
-    window = SDL_CreateWindow("VR Camera",                           //Titre
+    window = SDL_CreateWindow("Lancer de des",                           //Titre
         SDL_WINDOWPOS_UNDEFINED,               //X Position
         SDL_WINDOWPOS_UNDEFINED,               //Y Position
         WIDTH, HEIGHT,                         //Resolution

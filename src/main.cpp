@@ -299,10 +299,11 @@ int main(int argc, char* argv[])
             
             cpltShader.use();
             viewMat = mat4(1.0f);
-            //viewMat = glm::translate(viewMat, vec3(0.0f, f, 0.0f));
+            viewMat = glm::translate(viewMat, vec3(0.0f, -1.0f, -4.0f));
             //viewMat = glm::rotate(viewMat, glm::quarter_pi<float>() * ((float)SDL_GetTicks() / 1000), vec3(0.5f, 0.9f, 0.5f));
-            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>() * 0.75f, vec3(-1.0f, 1.0f, 0.0f));
+            //viewMat = glm::rotate(viewMat, glm::quarter_pi<float>() * 0.75f, vec3(-1.0f, 1.0f, 0.0f));
             projectionMat = mat4(1.0f);
+            projectionMat = glm::perspective(glm::quarter_pi<float>(), 800.0f / 800.0f, 0.1f, 100.0f);
             cpltShader.setMat4f("view", viewMat);
             cpltShader.setMat4f("projection", projectionMat);
 
