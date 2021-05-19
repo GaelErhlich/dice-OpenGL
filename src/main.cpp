@@ -506,7 +506,6 @@ int main(int argc, char* argv[])
             float transformationMatrixPCube[16];
             currTransformPCube.getOpenGLMatrix(transformationMatrixPCube);
             const Vector3& tposition = currTransformPCube.getPosition(); 
-            //std::cout << "Cube Position: (" << tposition.x << ", " << tposition.y << ", " << tposition.z << ")" << std::endl; 
             cubeCompo.calculateModelMatrix(glm::make_mat4(transformationMatrixPCube), mat4(1.0f) ); // On ne peut pas donner la matrice de rotation � cubeCompo pour mettre � jour ses normales, donc on ne les met pas � jour pour l'instant
             cubeCompo.draw();
 
