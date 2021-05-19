@@ -21,6 +21,8 @@
 
 #include "Cube.h"
 #include "Cylinder.h"
+#include "Sphere.h"
+#include "Cone.h"
 #include <time.h>
 
 #include "logger.h"
@@ -91,6 +93,7 @@ int main(int argc, char* argv[])
     //              Textures
     ////////////////////////////////////////
     
+    GLuint alTex = makeTexture("../textures/aluminium.jpg");
     GLuint woodText = makeTexture("../textures/wood.jpg");
     GLuint wallTex = makeTexture("../textures/wall.jpg");
     GLuint diceTex = makeTexture("../textures/Dice.jpg");
@@ -124,6 +127,14 @@ int main(int argc, char* argv[])
     GLuint vaoCylinder, vboCylinder;
     cylinder.getOneNewVAO(vaoCylinder, vboCylinder, GL_STATIC_DRAW);
 
+
+   ////////////////////////////////////////
+   //         Sphere             
+   ////////////////////////////////////////
+
+   Sphere sphere = Sphere(64, 64);
+   GLuint vaoSphere, vboSphere;
+   sphere.getOneNewVAO(vaoSphere, vboSphere, GL_STATIC_DRAW);
 
 
    ////////////////////////////////////////
@@ -228,22 +239,71 @@ int main(int argc, char* argv[])
     Compound tableLeg1Compo = Compound(vaoCylinder, cylinder.getNbVertices(), wallTex, &cpltShader, modelMat, rotModelMat);
     tableCompo.addChild(&tableLeg1Compo);
 
+    ////////////////////////////////////////
+    //          Compound : light
+    ////////////////////////////////////////
+    
+    modelMat = mat4(1.0);
+    rotModelMat = mat4(1.0);
+    modelMat = glm::scale(modelMat, vec3(0.15, 0.15, 0.15));
+    modelMat = glm::translate(modelMat, vec3(5.0f, 8.0f, 5.0f));
+    Compound bulbCompo = Compound(vaoSphere, sphere.getNbVertices(), 0, &cpltShader, modelMat, rotModelMat);
+    
+    modelMat = mat4(1.0);
+    rotModelMat = mat4(1.0);
+    modelMat = glm::scale(modelMat, vec3(0.15, 0.15, 0.15));
+    modelMat = glm::translate(modelMat, vec3(5.0f, 8.0f, 5.0f));
+    modelMat = glm::rotate(modelMat, glm::quarter_pi<float>(), vec3(1.0f, -1.0f, 0.0f));
+    rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(1.0f, -1.0f, 0.0f));
+    modelMat = glm::scale(modelMat, vec3(1.33f, 1.33f, 1.33f));
+    Compound bulbCylinderCompo = Compound(vaoCylinder, cylinder.getNbVertices(), alTex, &cpltShader, modelMat, rotModelMat);
+
+
+    modelMat = mat4(1.0);
+    rotModelMat = mat4(1.0);
+    modelMat = glm::scale(modelMat, vec3(0.15, 0.15, 0.15));
+    modelMat = glm::translate(modelMat, vec3(5.0f, 7.0f, 5.0f));
+    modelMat = glm::translate(modelMat, vec3(0.0f, -0.1f, 0.0f));
+    modelMat = glm::rotate(modelMat, glm::quarter_pi<float>(), vec3(1.0f, -1.0f, 0.0f));
+    rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(1.0f, -1.0f, 0.0f));
+    modelMat = glm::scale(modelMat, vec3(0.4f, 4.0f, 0.2));
+
+    Compound firstBranchCompound = Compound(vaoCube, cube.getNbVertices(), alTex, &cpltShader, modelMat, rotModelMat);
+
+    modelMat = mat4(1.0);
+    rotModelMat = mat4(1.0);
+    modelMat = glm::scale(modelMat, vec3(0.15, 0.15, 0.15));
+    modelMat = glm::translate(modelMat, vec3(5.0f, 7.0f, 5.0f));
+    modelMat = glm::translate(modelMat, vec3(0.0f, -4.0f, 0.0f));
+    modelMat = glm::rotate(modelMat, glm::quarter_pi<float>(), vec3(-1.0f, -1.0f, 0.0f));
+    rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(-1.0f, -1.0f, 0.0f));
+    modelMat = glm::scale(modelMat, vec3(0.4f, 4.0f, 0.2));
+
+    Compound secondBranchCompound = Compound(vaoCube, cube.getNbVertices(), alTex, &cpltShader, modelMat, rotModelMat);
+   
+    firstBranchCompound.addChild(&secondBranchCompound);
+    bulbCylinderCompo.addChild(&firstBranchCompound);
+    bulbCompo.addChild(&bulbCylinderCompo);
 
 
 
 
 
-
-    Vector3 positionPCube(0.0, 5.0, 0.0);
+    Vector3 positionPCube(0.0, 2.0, 0.0);
     Quaternion orientationPCube = Quaternion::identity();
     Transform transformPCube(positionPCube, orientationPCube);
     RigidBody* pCube = world->createRigidBody(transformPCube);
-    pCube->setMass(0.1);
+    pCube->setMass(0.05);
     const Vector3 halfExtentsPCube(0.05, 0.05, 0.05);
     BoxShape* boxShapePCube = physicsCommon.createBoxShape(halfExtentsPCube);
     Transform identity = Transform::identity();
     Collider* colliderPCube;
     colliderPCube = pCube->addCollider(boxShapePCube, identity);
+    Material& materialPCube = colliderPCube->getMaterial();
+    // materialPCube = colliderPCube->getMaterial();
+    materialPCube.setBounciness(0.1);
+    materialPCube.setRollingResistance(0.5);
+    materialPCube.setFrictionCoefficient(0.3);
 
     Vector3 positionPTable(0.0, -0.05, 0.0);
     Quaternion orientationPTable = Quaternion::identity();
@@ -267,12 +327,13 @@ int main(int argc, char* argv[])
     //
     ///////////////////////////////////////////////////////////////////////
     srand (time(NULL));
-    Vector3 force(rand()%7-3, rand()%7-3, rand()%7-3); 
-    // Apply a force to the center of the cube 
-    pCube->applyForceToCenterOfMass(force);
+    Vector3 force(rand()%10-3, 0, rand()%10-3); 
+    Vector3 point(0.1, 0.1, 0.1);
+    // // Apply a force to the center of the cube 
+    pCube->applyForceAtLocalPosition(force, point);
 
-    Vector3 torque(rand()%7-3, rand()%7-3,rand()%7-3); 
-    // Apply a torque to the cube
+    Vector3 torque(rand()%100, rand()%100,rand()%100); 
+    // // Apply a torque to the cube
     pCube->applyTorque(torque); 
     
     while (isOpened)
@@ -345,6 +406,7 @@ int main(int argc, char* argv[])
             //          Other objects
             ////////////////////////////////////////
 
+            bulbCompo.draw();
 
 
 
