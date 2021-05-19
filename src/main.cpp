@@ -183,7 +183,7 @@ int main(int argc, char* argv[])
 
 
     ////////////////////////////////////////
-    //       Complete program (cplt)
+    //          Shader programs
     ////////////////////////////////////////
 
     Shader cpltShader;
@@ -191,33 +191,52 @@ int main(int argc, char* argv[])
     cpltShader.use();
     cpltShader.enableTextureField(0);
 
+    Shader texShader;
+    texShader = *texShader.loadFromFiles("../Shaders/simpTex.vert", "../Shaders/simpTex.frag");
+    texShader.use();
+    texShader.enableTextureField(0);
+
+    Shader ambientShader;
+    ambientShader = *ambientShader.loadFromFiles("../Shaders/simpTex.vert", "../Shaders/ambientTex.frag");
+    texShader.use();
+    texShader.enableTextureField(0);
+
+    Shader unicolorShader;
+    unicolorShader = *unicolorShader.loadFromFiles("../Shaders/positions.vert", "../Shaders/colorUnif.frag");
+
 
 
     ////////////////////////////////////////
     //      Declaring loop variables
     ////////////////////////////////////////
+    
+    
     bool isOpened = true;
 
     int DRAW_NUMBER = -1;
+    int DICE_FORCE_TIME = 5000;
 
     Transform prevTransform;
+    int timeLastVelocityStop = 0;
 
-    mat4 modelMat;
-    mat4 rotModelMat;
-    mat4 viewMat;
-    mat4 projectionMat;
+    mat4 modelMat, rotModelMat, viewMat, projectionMat;
+    vec3 cameraPosition, lightSourcePosition;
+    vec3 lightColor;
+    float ambientIntensity;
 
+
+    // Temporarily used
     GLint location;
 
 
     ////////////////////////////////////////
-    //        Compound : some cube
+    //        Compound : Dice
     ////////////////////////////////////////
 
     modelMat = mat4(1.0f);
     modelMat = glm::scale(modelMat, vec3(0.1f, 0.1f, 0.1f));
     rotModelMat = mat4(1.0f);
-    Compound cubeCompo = Compound(vaoPatronCube, cube.getNbVertices(), diceTex, &cpltShader, modelMat, rotModelMat);
+    Compound cubeCompo = Compound(vaoPatronCube, cube.getNbVertices(), diceTex, &ambientShader, modelMat, rotModelMat);
 
 
     ////////////////////////////////////////
@@ -236,26 +255,27 @@ int main(int argc, char* argv[])
     modelMat = glm::rotate(modelMat, glm::half_pi<float>(), vec3(1.0f, 0.0f, 0.0f));
         rotModelMat = glm::rotate(rotModelMat, glm::half_pi<float>(), vec3(1.0f, 0.0f, 0.0f)); // A chaque fois qu'on fait une rotation sur une modelMat, on doit aussi la faire sur la rotModelMat
 
-    Compound tableLeg1Compo = Compound(vaoCylinder, cylinder.getNbVertices(), wallTex, &cpltShader, modelMat, rotModelMat);
+    Compound tableLeg1Compo = Compound(vaoCylinder, cylinder.getNbVertices(), woodText, &cpltShader, modelMat, rotModelMat);
     tableCompo.addChild(&tableLeg1Compo);
 
     ////////////////////////////////////////
-    //          Compound : light
+    //          Compound : Lightbulb
     ////////////////////////////////////////
     
     modelMat = mat4(1.0);
     rotModelMat = mat4(1.0);
     modelMat = glm::scale(modelMat, vec3(0.15, 0.15, 0.15));
     modelMat = glm::translate(modelMat, vec3(5.0f, 8.0f, 5.0f));
-    Compound bulbCompo = Compound(vaoSphere, sphere.getNbVertices(), 0, &cpltShader, modelMat, rotModelMat);
+    Compound bulbCompo = Compound(vaoSphere, sphere.getNbVertices(), 0, &unicolorShader, modelMat, rotModelMat);
     
     modelMat = mat4(1.0);
     rotModelMat = mat4(1.0);
     modelMat = glm::scale(modelMat, vec3(0.15, 0.15, 0.15));
     modelMat = glm::translate(modelMat, vec3(5.0f, 8.0f, 5.0f));
     modelMat = glm::rotate(modelMat, glm::quarter_pi<float>(), vec3(1.0f, -1.0f, 0.0f));
-    rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(1.0f, -1.0f, 0.0f));
+        rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(1.0f, -1.0f, 0.0f));
     modelMat = glm::scale(modelMat, vec3(1.33f, 1.33f, 1.33f));
+    
     Compound bulbCylinderCompo = Compound(vaoCylinder, cylinder.getNbVertices(), alTex, &cpltShader, modelMat, rotModelMat);
 
 
@@ -265,7 +285,7 @@ int main(int argc, char* argv[])
     modelMat = glm::translate(modelMat, vec3(5.0f, 7.0f, 5.0f));
     modelMat = glm::translate(modelMat, vec3(0.0f, -0.1f, 0.0f));
     modelMat = glm::rotate(modelMat, glm::quarter_pi<float>(), vec3(1.0f, -1.0f, 0.0f));
-    rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(1.0f, -1.0f, 0.0f));
+        rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(1.0f, -1.0f, 0.0f));
     modelMat = glm::scale(modelMat, vec3(0.4f, 4.0f, 0.2));
 
     Compound firstBranchCompound = Compound(vaoCube, cube.getNbVertices(), alTex, &cpltShader, modelMat, rotModelMat);
@@ -276,7 +296,7 @@ int main(int argc, char* argv[])
     modelMat = glm::translate(modelMat, vec3(5.0f, 7.0f, 5.0f));
     modelMat = glm::translate(modelMat, vec3(0.0f, -4.0f, 0.0f));
     modelMat = glm::rotate(modelMat, glm::quarter_pi<float>(), vec3(-1.0f, -1.0f, 0.0f));
-    rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(-1.0f, -1.0f, 0.0f));
+        rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(-1.0f, -1.0f, 0.0f));
     modelMat = glm::scale(modelMat, vec3(0.4f, 4.0f, 0.2));
 
     Compound secondBranchCompound = Compound(vaoCube, cube.getNbVertices(), alTex, &cpltShader, modelMat, rotModelMat);
@@ -327,14 +347,14 @@ int main(int argc, char* argv[])
     //
     ///////////////////////////////////////////////////////////////////////
     srand (time(NULL));
-    Vector3 force(rand()%10-3, 0, rand()%10-3); 
+    Vector3 force(rand()%10-3, 0, rand()%10-3);
     Vector3 point(0.1, 0.1, 0.1);
     // // Apply a force to the center of the cube 
     pCube->applyForceAtLocalPosition(force, point);
 
     Vector3 torque(rand()%100, rand()%100,rand()%100); 
     // // Apply a torque to the cube
-    pCube->applyTorque(torque); 
+    pCube->applyTorque(torque);
     
     while (isOpened)
     {
@@ -353,44 +373,93 @@ int main(int argc, char* argv[])
             glClearColor(0.25f, 0.23f, 0.40f, 1.0f);
             glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
+
             ////////////////////////////////////////
-            //    viewMat & projectionMat : cplt
+            //      Updating loop variables
             ////////////////////////////////////////
-            // Force vector (in Newton) 
+
+            cameraPosition = vec3(0.0f, 1.0f, 0.0f);  // A CHANGER POUR LA SPECULAR LIGHT
+            lightSourcePosition = vec3(0.0f, 1.0f, 0.0f);
+
+            ambientIntensity = 0.4;
+            lightColor = vec3(1.0f, 0.0f, 1.0f);
+
+
+
+
+            ////////////////////////////////////////
+            //          Uniforms : cplt
+            ////////////////////////////////////////
             
             cpltShader.use();
             viewMat = mat4(1.0f);
             viewMat = glm::translate(viewMat, vec3(0.0f, -1.0f, -4.0f));
-            //viewMat = glm::rotate(viewMat, glm::quarter_pi<float>() * ((float)SDL_GetTicks() / 1000), vec3(0.5f, 0.9f, 0.5f));
+            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>() * ((float)SDL_GetTicks() / 1000), vec3(0.5f, 0.9f, 0.5f));
             //viewMat = glm::rotate(viewMat, glm::quarter_pi<float>() * 0.75f, vec3(-1.0f, 1.0f, 0.0f));
             projectionMat = mat4(1.0f);
             projectionMat = glm::perspective(glm::quarter_pi<float>(), 800.0f / 800.0f, 0.1f, 100.0f);
+            
             cpltShader.setMat4f("view", viewMat);
             cpltShader.setMat4f("projection", projectionMat);
 
             // Light
-            cpltShader.setVec3f("ambientLight", vec3(0.05f, 0.05f, 0.05f));
-            cpltShader.setVec3f("lightColor", vec3(1.0f, 0.8f, 0.8f));
-            cpltShader.setVec3f("lightPos", vec3(0.0f, 1.0f, 0.0f));
-            cpltShader.setVec3f("cameraCoord", vec3(0.0f, 1.0f, 0.0f)); // A CHANGER POUR LA SPECULAR LIGHT
+            cpltShader.setFloat("ambientIntens", ambientIntensity);
+            cpltShader.setVec3f("lightColor", lightColor);
+            cpltShader.setVec3f("lightPos", lightSourcePosition);
+            cpltShader.setVec3f("cameraCoord", cameraPosition); 
             cpltShader.setFloat("specularStrength", 0.3);
             
 
+            ////////////////////////////////////////
+            //        Uniforms : simpTex
+            ////////////////////////////////////////
+
+            texShader.use();
+
+            texShader.setMat4f("view", viewMat);
+            texShader.setMat4f("projection", projectionMat);
 
 
             ////////////////////////////////////////
-            //        Cube compound test
+            //      Uniforms : ambientTex
             ////////////////////////////////////////
-            // Constant physics time step 
+
+            ambientShader.use();
+
+            ambientShader.setMat4f("view", viewMat);
+            ambientShader.setMat4f("projection", projectionMat);
+
+            ambientShader.setFloat("ambientLight", ambientIntensity);
+            ambientShader.setVec3f("lightColor", lightColor);
+
+
+            ////////////////////////////////////////
+            //      Uniforms : ambientTex
+            ////////////////////////////////////////
+
+            unicolorShader.use();
+
+            unicolorShader.setMat4f("view", viewMat);
+            unicolorShader.setMat4f("projection", projectionMat);
+
+            ////////////////////////////////////////
+            //                Dice
+            ////////////////////////////////////////
             
-            const float timeStep = 1.0f / 60.0f; 
-            world->update(timeStep); 
+            if (SDL_GetTicks() > DICE_FORCE_TIME && SDL_GetTicks() < DICE_FORCE_TIME+15000 && SDL_GetTicks() > timeLastVelocityStop+500) {
+                pCube->setAngularVelocity( pCube->getAngularVelocity() * 0.75 );
+                pCube->setLinearVelocity( pCube->getLinearVelocity() * 0.75 );
+                timeLastVelocityStop = SDL_GetTicks();
+            }
+
+            const float timeStep = 1.0f / 60.0f; // Constant physics time step 
+            world->update(timeStep);
             Transform currTransformPCube = pCube->getTransform(); 
             float transformationMatrixPCube[16];
             currTransformPCube.getOpenGLMatrix(transformationMatrixPCube);
             const Vector3& tposition = currTransformPCube.getPosition(); 
             //std::cout << "Cube Position: (" << tposition.x << ", " << tposition.y << ", " << tposition.z << ")" << std::endl; 
-            cubeCompo.calculateModelMatrix(glm::make_mat4(transformationMatrixPCube), mat4(1.0f) ); // On ne peut pas donner la matrice de rotation � cubeCompo pour mettre � jour ses normales, donc on ne les mets pas � jour pour l'instant
+            cubeCompo.calculateModelMatrix(glm::make_mat4(transformationMatrixPCube), mat4(1.0f) ); // On ne peut pas donner la matrice de rotation � cubeCompo pour mettre � jour ses normales, donc on ne les met pas � jour pour l'instant
             cubeCompo.draw();
 
 
@@ -403,11 +472,13 @@ int main(int argc, char* argv[])
 
 
             ////////////////////////////////////////
-            //          Other objects
+            //              Lamp
             ////////////////////////////////////////
 
-            bulbCompo.draw();
 
+            unicolorShader.use();
+            unicolorShader.setVec3f("unicolor", lightColor);
+            bulbCompo.draw();
 
 
         

@@ -3,7 +3,7 @@
 /*
 	cplt.frag
 	IN	: 3 world coordinates, normal vector, 2 uv coordinates
-	UNI	: 1 texture
+	UNI	: 1 texture, 3 light source coords, 3 camera coords, light source color (RGB), ambient light intensity, specular light intensity
 	OUT	: point color/texture (RGB1)
 */
 
@@ -15,7 +15,7 @@ uniform sampler2D texture1;
 uniform vec3 lightPos;
 uniform vec3 cameraCoord;
 uniform vec3 lightColor;
-uniform vec3 ambientLight;
+uniform float ambientIntens;
 uniform float specularStrength;
 
 out vec4 FragColor;
@@ -32,6 +32,6 @@ void main()
 	specularLight = pow(specularLight, 256);
 
 	// Finally
-	vec4 color = vec4( lightColor * (diffusion + specularStrength*specularLight) + ambientLight , 1.0f);
+	vec4 color = vec4( lightColor * (diffusion + specularStrength*specularLight), 1.0f) + vec4(ambientIntens,ambientIntens,ambientIntens,1.0);
 	FragColor = texture(texture1, texCoord) * color * vec4(lightColor, 1.0);
 }
