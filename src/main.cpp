@@ -46,13 +46,6 @@ using glm::mat4;
 
 
 
-////////////////////////////////////////
-//          Global variables
-////////////////////////////////////////
-
-
-
-
 int main(int argc, char* argv[])
 {
     ////////////////////////////////////////
@@ -86,6 +79,22 @@ int main(int argc, char* argv[])
     //           ---------  INITIALIZING ELEMENTS  ---------
     //
     ///////////////////////////////////////////////////////////////////////
+
+
+    //////////////////////////////////////// */
+    //            Color list
+    ////////////////////////////////////////
+
+    vec3 colors[] = {
+        vec3(1.0f, 1.0f, 1.0f), // White
+        vec3(1.0f, 0.0f, 0.0f), // Red
+        vec3(0.0f, 1.0f, 0.0f), // Green
+        vec3(0.0f, 0.0f, 1.0f), // Blue
+        vec3(1.0f, 1.0f, 0.0f), // Yellow
+        vec3(1.0f, 0.0f, 1.0f), // Magenta
+        vec3(0.0f, 1.0f, 1.0f), // Cyan
+    };
+
 
 
 
@@ -212,20 +221,28 @@ int main(int argc, char* argv[])
     
     
     bool isOpened = true;
+    float upDownParameter = 1.0f;
+    float leftRightParameter = 1.0f;
+    unsigned int numberAmong7 = 0;
+    
+    int timeLastLoop = 0;
 
     int DRAW_NUMBER = -1;
     int DICE_FORCE_TIME = 5000;
+
+    float currentAngle = 0;
 
     Transform prevTransform;
     int timeLastVelocityStop = 0;
 
     mat4 modelMat, rotModelMat, viewMat, projectionMat;
-    vec3 cameraPosition, lightSourcePosition;
+    vec3 cameraPosition;
+    vec3 lightSourcePosition = vec3(0.6, 1.0, 0.5);
     vec3 lightColor;
     float ambientIntensity;
 
 
-    // Temporarily used
+    // Temporarily used but many times
     GLint location;
 
 
@@ -259,51 +276,81 @@ int main(int argc, char* argv[])
     tableCompo.addChild(&tableLeg1Compo);
 
     ////////////////////////////////////////
-    //          Compound : Lightbulb
+    //        Compound : Lightbulb
     ////////////////////////////////////////
     
     modelMat = mat4(1.0);
     rotModelMat = mat4(1.0);
-    modelMat = glm::scale(modelMat, vec3(0.15, 0.15, 0.15));
-    modelMat = glm::translate(modelMat, vec3(5.0f, 8.0f, 5.0f));
+    modelMat = glm::translate(modelMat, lightSourcePosition);
+    modelMat = glm::scale(modelMat, vec3(0.14, 0.14, 0.14));
     Compound bulbCompo = Compound(vaoSphere, sphere.getNbVertices(), 0, &unicolorShader, modelMat, rotModelMat);
     
     modelMat = mat4(1.0);
     rotModelMat = mat4(1.0);
-    modelMat = glm::scale(modelMat, vec3(0.15, 0.15, 0.15));
-    modelMat = glm::translate(modelMat, vec3(5.0f, 8.0f, 5.0f));
-    modelMat = glm::rotate(modelMat, glm::quarter_pi<float>(), vec3(1.0f, -1.0f, 0.0f));
-        rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(1.0f, -1.0f, 0.0f));
-    modelMat = glm::scale(modelMat, vec3(1.33f, 1.33f, 1.33f));
+    modelMat = glm::translate(modelMat, lightSourcePosition);
+    modelMat = glm::rotate(modelMat, glm::quarter_pi<float>(), vec3(0.0f, 1.0f, 0.0f));
+            rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(0.0f, 1.0f, 0.0f));
+    modelMat = glm::rotate(modelMat, -glm::quarter_pi<float>(), vec3(1.0f, 0.0f, 0.0f) );
+            rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(1.0f, 0.0f, 0.0f));
+    modelMat = glm::translate(modelMat, vec3(0.0f, 0.0f, -0.03f));
+    modelMat = glm::scale(modelMat, vec3(0.15, 0.15, 0.2));
     
     Compound bulbCylinderCompo = Compound(vaoCylinder, cylinder.getNbVertices(), alTex, &cpltShader, modelMat, rotModelMat);
 
 
     modelMat = mat4(1.0);
     rotModelMat = mat4(1.0);
-    modelMat = glm::scale(modelMat, vec3(0.15, 0.15, 0.15));
-    modelMat = glm::translate(modelMat, vec3(5.0f, 7.0f, 5.0f));
-    modelMat = glm::translate(modelMat, vec3(0.0f, -0.1f, 0.0f));
-    modelMat = glm::rotate(modelMat, glm::quarter_pi<float>(), vec3(1.0f, -1.0f, 0.0f));
-        rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(1.0f, -1.0f, 0.0f));
-    modelMat = glm::scale(modelMat, vec3(0.4f, 4.0f, 0.2));
+    modelMat = glm::translate(modelMat, lightSourcePosition);
+    modelMat = glm::translate(modelMat, vec3(0.0f, -0.05f, 0.0f));
+    modelMat = glm::rotate(modelMat, glm::quarter_pi<float>(), vec3(0.0f, 1.0f, 0.0f));
+            rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(0.0f, 1.0f, 0.0f));
+    modelMat = glm::translate(modelMat, vec3(0.0f, 0.0f, 0.12f));
+    modelMat = glm::rotate(modelMat, glm::quarter_pi<float>(), vec3(1.0f, 0.0f, 0.0f));
+            rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(1.0f, 0.0f, 0.0f));
+    modelMat = glm::scale(modelMat, vec3(0.05, 0.04, 0.6));
 
     Compound firstBranchCompound = Compound(vaoCube, cube.getNbVertices(), alTex, &cpltShader, modelMat, rotModelMat);
 
+
     modelMat = mat4(1.0);
     rotModelMat = mat4(1.0);
-    modelMat = glm::scale(modelMat, vec3(0.15, 0.15, 0.15));
-    modelMat = glm::translate(modelMat, vec3(5.0f, 7.0f, 5.0f));
-    modelMat = glm::translate(modelMat, vec3(0.0f, -4.0f, 0.0f));
-    modelMat = glm::rotate(modelMat, glm::quarter_pi<float>(), vec3(-1.0f, -1.0f, 0.0f));
-        rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(-1.0f, -1.0f, 0.0f));
-    modelMat = glm::scale(modelMat, vec3(0.4f, 4.0f, 0.2));
+    modelMat = glm::translate(modelMat, vec3(0.25f, -0.3f, 0.25f));
+    modelMat = glm::translate(modelMat, lightSourcePosition);
+    modelMat = glm::scale(modelMat, vec3(0.1, 0.1, 0.1));
+    
+    Compound interbranchBallCompo = Compound(vaoSphere, sphere.getNbVertices(), alTex, &cpltShader, modelMat, rotModelMat);
+
+
+    modelMat = mat4(1.0);
+    rotModelMat = mat4(1.0);
+    modelMat = glm::translate(modelMat, lightSourcePosition);
+    modelMat = glm::translate(modelMat, vec3(0.15f, -0.6f, 0.15f));
+    modelMat = glm::rotate(modelMat, glm::quarter_pi<float>(), vec3(0.0f, 1.0f, 0.0f));
+            rotModelMat = glm::rotate(rotModelMat, glm::quarter_pi<float>(), vec3(0.0f, 1.0f, 0.0f));
+    modelMat = glm::rotate(modelMat, -glm::quarter_pi<float>()*1.5f, vec3(1.0f, 0.0f, 0.0f));
+            rotModelMat = glm::rotate(rotModelMat, -glm::quarter_pi<float>()*1.5f, vec3(1.0f, 0.0f, 0.0f));
+    modelMat = glm::scale(modelMat, vec3(0.05, 0.04, 0.6));
 
     Compound secondBranchCompound = Compound(vaoCube, cube.getNbVertices(), alTex, &cpltShader, modelMat, rotModelMat);
    
-    firstBranchCompound.addChild(&secondBranchCompound);
+    
+    modelMat = mat4(1.0f);
+    rotModelMat = mat4(1.0);
+    modelMat = glm::translate(modelMat, lightSourcePosition);
+    modelMat = glm::translate(modelMat, vec3(0.1f, -0.9f, 0.1f));
+    modelMat = glm::scale(modelMat, vec3(0.2f, 0.2f, 0.2f));
+
+    Compound lampSupportCompo = Compound(vaoCube, cube.getNbVertices(), alTex, &cpltShader, modelMat, rotModelMat);
+
+
+
+
+    secondBranchCompound.addChild(&lampSupportCompo);
+    interbranchBallCompo.addChild(&secondBranchCompound);
+    firstBranchCompound.addChild(&interbranchBallCompo);
     bulbCylinderCompo.addChild(&firstBranchCompound);
     bulbCompo.addChild(&bulbCylinderCompo);
+
 
 
 
@@ -366,11 +413,11 @@ int main(int argc, char* argv[])
         uint32_t timeBegin = SDL_GetTicks();
 
         // Treat inputs
-        manageEvents(isOpened);
+        manageEvents(isOpened, upDownParameter, leftRightParameter, numberAmong7);
 
         // Clear the screen : the depth buffer and the color buffer
         if (DRAW_NUMBER != 0) {
-            glClearColor(0.25f, 0.23f, 0.40f, 1.0f);
+            glClearColor(0.02f, 0.02f, 0.05f, 1.0f);
             glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 
@@ -378,13 +425,20 @@ int main(int argc, char* argv[])
             //      Updating loop variables
             ////////////////////////////////////////
 
-            cameraPosition = vec3(0.0f, 1.0f, 0.0f);  // A CHANGER POUR LA SPECULAR LIGHT
-            lightSourcePosition = vec3(0.0f, 1.0f, 0.0f);
 
-            ambientIntensity = 0.4;
-            lightColor = vec3(1.0f, 0.0f, 1.0f);
+            ambientIntensity = 0.2;
+            lightColor = colors[numberAmong7] * upDownParameter;
 
+            currentAngle += (SDL_GetTicks() - timeLastLoop)*leftRightParameter/1000;
+            cameraPosition = vec3(-sin(currentAngle), 2.0, cos(currentAngle) );
+            
 
+            viewMat = mat4(1.0f);
+            viewMat = glm::translate(viewMat, vec3(0.0f, 0.0f, -4.0f));
+            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>()*0.75f, vec3(1.0f, 0.0f, 0.0f));
+            viewMat = glm::rotate(viewMat, currentAngle, vec3(0.0f, 1.0f, 0.0f));
+            projectionMat = mat4(1.0f);
+            projectionMat = glm::perspective(glm::quarter_pi<float>(), 800.0f / 800.0f, 0.1f, 100.0f);
 
 
             ////////////////////////////////////////
@@ -392,12 +446,6 @@ int main(int argc, char* argv[])
             ////////////////////////////////////////
             
             cpltShader.use();
-            viewMat = mat4(1.0f);
-            viewMat = glm::translate(viewMat, vec3(0.0f, -1.0f, -4.0f));
-            viewMat = glm::rotate(viewMat, glm::quarter_pi<float>() * ((float)SDL_GetTicks() / 1000), vec3(0.5f, 0.9f, 0.5f));
-            //viewMat = glm::rotate(viewMat, glm::quarter_pi<float>() * 0.75f, vec3(-1.0f, 1.0f, 0.0f));
-            projectionMat = mat4(1.0f);
-            projectionMat = glm::perspective(glm::quarter_pi<float>(), 800.0f / 800.0f, 0.1f, 100.0f);
             
             cpltShader.setMat4f("view", viewMat);
             cpltShader.setMat4f("projection", projectionMat);
@@ -407,7 +455,7 @@ int main(int argc, char* argv[])
             cpltShader.setVec3f("lightColor", lightColor);
             cpltShader.setVec3f("lightPos", lightSourcePosition);
             cpltShader.setVec3f("cameraCoord", cameraPosition); 
-            cpltShader.setFloat("specularStrength", 0.3);
+            cpltShader.setFloat("specularStrength", 0.8);
             
 
             ////////////////////////////////////////
@@ -498,6 +546,9 @@ int main(int argc, char* argv[])
         // We want FRAMERATE FPS
         if (timeEnd - timeBegin < TIME_PER_FRAME_MS)
             SDL_Delay(TIME_PER_FRAME_MS - (timeEnd - timeBegin));
+
+
+        timeLastLoop = timeEnd;
 
 
     }
